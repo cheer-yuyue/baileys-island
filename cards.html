@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bailey's Cards · 百灵卡</title>
+<style>
+  :root{
+    --bg:#f7f2ea;
+    --bg-soft:#fdfaf4;
+    --ink:#3a3530;
+    --ink-soft:#6f675d;
+    --line:#e4dccd;
+    --accent:#2f6f6a;
+    --accent-soft:#dcebe6;
+    --card-w:220px;
+    --card-h:320px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* ---------- 导航 ---------- */
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(247,242,234,.92);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+    padding:10px 0;
+  }
+  .nav-inner{
+    max-width:1180px;margin:0 auto;padding:0 20px;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .nav-brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.5px}
+  .nav-brand .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);display:inline-block}
+  .nav-links{display:flex;gap:22px;font-size:14px}
+  .nav-links a{color:var(--ink-soft);text-decoration:none;transition:color .2s}
+  .nav-links a:hover{color:var(--accent)}
+  @media(max-width:760px){.nav-links{display:none}}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    max-width:1180px;margin:0 auto;padding:64px 20px 40px;
+    display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center;
+  }
+  @media(max-width:900px){.hero{grid-template-columns:1fr;padding-top:40px}}
+  .hero .kicker{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:13px;letter-spacing:2px;color:var(--accent);
+    background:var(--accent-soft);padding:6px 14px;border-radius:999px;font-weight:600;
+  }
+  .hero h1{
+    font-size:44px;line-height:1.25;margin:18px 0 10px;font-weight:800;letter-spacing:1px;
+  }
+  .hero h1 .en{display:block;font-size:15px;letter-spacing:5px;color:var(--ink-soft);font-weight:600;margin-top:6px}
+  .hero .sub{
+    font-size:19px;color:var(--ink-soft);margin:14px 0 26px;font-weight:600;
+  }
+  .hero .desc{font-size:15px;color:var(--ink-soft);max-width:520px}
+  .hero-cta{display:flex;gap:14px;margin-top:26px;flex-wrap:wrap}
+  .btn{
+    display:inline-block;padding:12px 22px;border-radius:999px;font-size:15px;font-weight:600;
+    text-decoration:none;border:none;cursor:pointer;transition:transform .15s,box-shadow .15s;
+  }
+  .btn-primary{background:var(--accent);color:#fff}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(47,111,106,.28)}
+  .btn-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+  /* hero 卡牌装饰 */
+  .hero-cards{position:relative;height:380px;perspective:1200px}
+  .f-card{
+    position:absolute;width:170px;height:250px;border-radius:14px;
+    box-shadow:0 18px 40px rgba(90,75,55,.18);
+    display:flex;align-items:center;justify-content:center;text-align:center;padding:18px;
+    font-size:15px;font-weight:600;color:#fff;line-height:1.6;
+  }
+  .fc1{background:linear-gradient(160deg,#E07A5F,#c96248);top:20px;left:6px;transform:rotate(-10deg);z-index:1}
+  .fc2{background:linear-gradient(160deg,#4A9D8F,#2f7568);top:55px;left:90px;transform:rotate(4deg);z-index:2}
+  .fc3{background:linear-gradient(160deg,#8B7BB8,#6f5f9e);top:15px;right:6px;transform:rotate(12deg);z-index:1}
+  .fc4{
+    background:#fff;color:var(--ink);border:1px solid var(--line);
+    top:130px;left:38px;width:190px;height:275px;z-index:3;transform:rotate(-2deg);
+    flex-direction:column;justify-content:flex-start;padding:22px;box-shadow:0 22px 50px rgba(90,75,55,.22);
+  }
+  .fc4 .logo{width:34px;height:34px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:12px}
+  .fc4 h3{font-size:19px;letter-spacing:1px;margin-bottom:8px}
+  .fc4 p{font-size:12px;color:var(--ink-soft);font-weight:400}
+  .fc4 .line{width:40px;height:3px;background:var(--accent);border-radius:2px;margin:14px 0}
+  .fc5{
+    background:linear-gradient(160deg,#FFB74D,#f57c00);top:60px;left:200px;transform:rotate(8deg);z-index:0;width:150px;height:220px;
+    align-items:center;justify-content:center;font-size:14px;
+  }
+  @media(max-width:900px){.hero-cards{height:340px;transform:scale(.9)}}
+
+  /* ---------- 区块通用 ---------- */
+  section{padding:56px 20px;scroll-margin-top:72px}
+  .wrap{max-width:1180px;margin:0 auto}
+  .sec-head{text-align:center;margin-bottom:40px}
+  .sec-head .tag{font-size:13px;letter-spacing:3px;color:var(--accent);font-weight:700}
+  .sec-head h2{font-size:30px;margin-top:8px;font-weight:800;letter-spacing:1px}
+  .sec-head p{color:var(--ink-soft);font-size:15px;margin-top:10px;max-width:640px;margin-left:auto;margin-right:auto}
+  .alt{background:var(--bg-soft);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+
+  /* ---------- 项目概览 数据卡 ---------- */
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  @media(max-width:900px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
+  .stat{
+    background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px 20px;text-align:center;
+    transition:transform .2s,box-shadow .2s;
+  }
+  .stat:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(90,75,55,.1)}
+  .stat .num{font-size:30px;font-weight:800;color:var(--accent)}
+  .stat .lab{font-size:13px;color:var(--ink-soft);margin-top:4px}
+  .principles{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:34px}
+  @media(max-width:900px){.principles{grid-template-columns:1fr}}
+  .principle{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px}
+  .principle .icon{font-size:26px}
+  .principle h4{font-size:16px;margin:10px 0 6px}
+  .principle p{font-size:14px;color:var(--ink-soft)}
+
+  /* ---------- 包装盒 ---------- */
+  .box-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  @media(max-width:900px){.box-grid{grid-template-columns:1fr}}
+  .box-item{
+    background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;
+    transition:transform .2s,box-shadow .2s;
+  }
+  .box-item:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(90,75,55,.12)}
+  .box-item .box-label{font-size:12px;letter-spacing:2px;color:var(--accent);font-weight:700;padding:14px 20px 0}
+  .box-face{padding:20px}
+  .box-face-inner{
+    border-radius:12px;padding:20px;background:linear-gradient(165deg,#2f6f6a,#24524e);
+    color:#f2ece1;min-height:220px;position:relative;overflow:hidden;
+  }
+  .box-face-inner .side-top{font-size:11px;letter-spacing:3px;opacity:.85}
+  .box-face-inner h3{font-size:21px;letter-spacing:1px;margin:10px 0 4px;font-weight:800}
+  .box-face-inner .en{font-size:10px;letter-spacing:2px;opacity:.7}
+  .box-face-inner .divider{width:36px;height:2px;background:#e9b44c;margin:14px 0;border-radius:2px}
+  .box-face-inner p{font-size:13px;line-height:1.9;opacity:.95}
+  .box-face-inner .corner{position:absolute;bottom:14px;right:18px;font-size:11px;letter-spacing:2px;opacity:.8}
+  .box-face-inner.side{background:linear-gradient(165deg,#E07A5F,#c96248)}
+  .box-list{font-size:13px;color:var(--ink-soft);line-height:2;padding:0 20px 18px}
+  .box-list b{color:var(--ink)}
+
+  /* ---------- 卡牌浏览 ---------- */
+  .mod-tabs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:14px}
+  .mod-tab{
+    padding:9px 18px;border-radius:999px;border:1.5px solid var(--line);background:#fff;
+    font-size:14px;cursor:pointer;font-weight:600;color:var(--ink-soft);transition:all .2s;
+  }
+  .mod-tab:hover{border-color:var(--accent);color:var(--accent)}
+  .mod-tab.active{color:#fff;border-color:transparent}
+  .mod-note{text-align:center;font-size:13px;color:var(--ink-soft);margin-bottom:26px}
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:20px}
+  @media(max-width:560px){.card-grid{grid-template-columns:repeat(2,1fr);gap:12px}}
+  .tcard{perspective:1000px;height:310px;cursor:pointer}
+  .tcard-inner{position:relative;width:100%;height:100%;transition:transform .55s;transform-style:preserve-3d}
+  .tcard.flipped .tcard-inner{transform:rotateY(180deg)}
+  .tcard-face{
+    position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    border-radius:14px;padding:18px;display:flex;flex-direction:column;
+    box-shadow:0 10px 26px rgba(90,75,55,.12);
+  }
+  .tcard-front{
+    background:#fff;border:1px solid var(--line);
+    justify-content:space-between;
+  }
+  .tcard-front .tno{font-size:12px;letter-spacing:1px;color:var(--ink-soft);font-weight:600}
+  .tcard-front .ttitle{font-size:17px;font-weight:800;line-height:1.5;margin:8px 0;color:var(--ink)}
+  .tcard-front .ttext{font-size:13px;color:var(--ink-soft);line-height:1.8;flex:1}
+  .tcard-front .tsub{font-size:11px;color:var(--accent);font-weight:700;letter-spacing:1px}
+  .tcard-back{
+    transform:rotateY(180deg);
+    color:#fff;justify-content:center;
+  }
+  .tcard-back .q{font-size:15px;font-weight:700;line-height:1.7}
+  .tcard-back .qtip{font-size:12px;opacity:.9;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.35)}
+  .tcard-back .flip-hint{position:absolute;bottom:12px;font-size:10px;opacity:.7;letter-spacing:1px}
+
+  /* 灵感卡牌特殊样式 */
+  .insp-card{perspective:1000px;height:310px;cursor:pointer}
+  .insp-card-inner{position:relative;width:100%;height:100%;transition:transform .55s;transform-style:preserve-3d}
+  .insp-card.flipped .insp-card-inner{transform:rotateY(180deg)}
+  .insp-face{
+    position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    border-radius:14px;padding:20px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;
+    box-shadow:0 10px 26px rgba(90,75,55,.14);
+  }
+  .insp-front{color:#fff}
+  .insp-front .in-no{position:absolute;top:14px;left:16px;font-size:11px;letter-spacing:1px;opacity:.85}
+  .insp-front .in-zh{font-size:17px;font-weight:700;line-height:1.8;margin-bottom:10px}
+  .insp-front .in-en{font-size:12px;line-height:1.7;opacity:.9;font-weight:500}
+  .insp-back{
+    transform:rotateY(180deg);background:#fff;border:1px solid var(--line);color:var(--ink);
+    align-items:center;justify-content:center;gap:12px;
+  }
+  .insp-back .in-logo{width:44px;height:44px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800}
+  .insp-back .in-tip{font-size:13px;color:var(--ink-soft);line-height:1.9;max-width:160px}
+  .insp-back .in-hint{position:absolute;bottom:12px;font-size:10px;color:var(--ink-soft);opacity:.7;letter-spacing:1px}
+
+  .guide-card{
+    grid-column:1/-1;display:flex;gap:18px;align-items:center;
+    background:var(--bg-soft);border:1.5px dashed var(--line);border-radius:14px;padding:18px 22px;
+  }
+  @media(max-width:700px){.guide-card{flex-direction:column;align-items:flex-start}}
+  .guide-card .badge{flex-shrink:0;font-size:12px;font-weight:700;padding:6px 12px;border-radius:999px;color:#fff}
+  .guide-card .g-title{font-size:15px;font-weight:800}
+  .guide-card .g-text{font-size:13px;color:var(--ink-soft);line-height:1.8;margin-top:4px}
+  .practice-card{
+    grid-column:1/-1;display:flex;gap:14px;align-items:flex-start;
+    background:#fff;border:1px solid var(--line);border-left:5px solid var(--accent);
+    border-radius:14px;padding:16px 20px;
+  }
+  .practice-card .p-badge{flex-shrink:0;font-size:12px;font-weight:800;color:var(--accent)}
+  .practice-card .p-title{font-size:14px;font-weight:800}
+  .practice-card .p-text{font-size:13px;color:var(--ink-soft);line-height:1.8}
+
+  /* ---------- 规则区 ---------- */
+  .rules-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+  @media(max-width:900px){.rules-grid{grid-template-columns:1fr}}
+  .rule-item{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px}
+  .rule-item h4{font-size:17px;font-weight:800;display:flex;align-items:center;gap:8px}
+  .rule-item .rn{width:26px;height:26px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:inline-flex;align-items:center;justify-content:center;font-size:13px}
+  .rule-item .rbody{font-size:13.5px;color:var(--ink-soft);line-height:1.9;margin-top:12px}
+  .rule-item .rbody b{color:var(--ink)}
+  .quick-card{
+    margin-top:24px;background:linear-gradient(135deg,#fff,#fdf6e9);border:1.5px solid #e9b44c;
+    border-radius:18px;padding:26px;display:grid;grid-template-columns:1fr 1fr;gap:20px;
+  }
+  @media(max-width:700px){.quick-card{grid-template-columns:1fr}}
+  .quick-card h4{font-size:17px;font-weight:800;margin-bottom:10px}
+  .quick-card ol{margin-left:18px;font-size:14px;color:var(--ink-soft);line-height:2.2}
+  .quick-card .qc-right{font-size:14px;color:var(--ink-soft);line-height:2}
+  .quick-card .qc-right b{color:var(--ink)}
+  .insp-rule{
+    margin-top:20px;background:linear-gradient(135deg,#fff,#f3e5f5);border:1.5px solid #ce93d8;
+    border-radius:18px;padding:22px;
+  }
+  .insp-rule h4{font-size:17px;font-weight:800;margin-bottom:10px}
+  .insp-rule p{font-size:13.5px;color:var(--ink-soft);line-height:1.9}
+
+  /* ---------- 核心亮点与适用场景 ---------- */
+  .hero-badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+  .hero-badges span{font-size:12.5px;font-weight:600;color:var(--ink-soft);background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 15px;letter-spacing:.5px}
+  .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  @media(max-width:900px){.feat-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.feat-grid{grid-template-columns:1fr}}
+  .feat-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:26px 24px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
+  .feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--accent),#E9B44C)}
+  .feat-card:hover{transform:translateY(-4px);box-shadow:0 14px 32px rgba(90,75,55,.12)}
+  .feat-card .f-icon{font-size:30px}
+  .feat-card h4{font-size:16px;font-weight:800;margin:12px 0 6px}
+  .feat-card p{font-size:13.5px;color:var(--ink-soft);line-height:1.9}
+  .scn-band{margin-top:32px;background:linear-gradient(135deg,#fff,#fdf6e9);border:1.5px solid #ecd9a8;border-radius:18px;padding:26px}
+  .scn-band h3{font-size:17px;font-weight:800;letter-spacing:1px;text-align:center;margin-bottom:18px}
+  .scn-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  @media(max-width:900px){.scn-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.scn-grid{grid-template-columns:1fr}}
+  .scn-item{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 16px;text-align:center;transition:transform .2s,box-shadow .2s}
+  .scn-item:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(90,75,55,.1)}
+  .scn-item .scn-ico{font-size:26px}
+  .scn-item .scn-t{font-size:14px;font-weight:800;margin:8px 0 4px}
+  .scn-item .scn-b{font-size:12.5px;color:var(--ink-soft);line-height:1.8}
+
+  /* ---------- 抽牌 Modal ---------- */
+  .draw-fixed{
+    position:fixed;inset:0;background:rgba(58,53,48,.55);backdrop-filter:blur(6px);
+    display:none;align-items:center;justify-content:center;z-index:100;padding:20px;
+  }
+  .draw-fixed.show{display:flex}
+  .draw-stage{width:240px;height:350px;perspective:1200px;cursor:pointer}
+  .draw-card{position:relative;width:100%;height:100%;transition:transform .8s;transform-style:preserve-3d}
+  .draw-stage.draw .draw-card{transform:rotateY(180deg)}
+  .draw-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;padding:22px;display:flex;flex-direction:column;justify-content:center;box-shadow:0 26px 60px rgba(0,0,0,.35)}
+  .draw-back{background:var(--accent);color:#fff;align-items:center;text-align:center;gap:14px}
+  .draw-back .logo{width:54px;height:54px;border-radius:50%;border:2px solid rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto}
+  .draw-back p{font-size:13px;letter-spacing:4px;opacity:.85}
+  .draw-front{background:#fff;color:var(--ink);transform:rotateY(180deg);align-items:center;text-align:center;gap:10px}
+  .draw-front .dno{font-size:12px;color:var(--ink-soft);font-weight:600}
+  .draw-front .dtitle{font-size:21px;font-weight:800;line-height:1.5}
+  .draw-front .dtext{font-size:13.5px;color:var(--ink-soft);line-height:1.9;border-top:1px solid var(--line);padding-top:12px}
+  .draw-front .dq{font-size:15px;font-weight:700;border-top:1px solid var(--line);padding-top:12px}
+  .draw-front .dtip{font-size:12px;color:var(--ink-soft)}
+  .draw-insp-front{background:linear-gradient(160deg,#FFB74D,#f57c00);color:#fff;transform:rotateY(180deg);align-items:center;text-align:center;gap:12px;padding:28px}
+  .draw-insp-front .di-zh{font-size:19px;font-weight:700;line-height:1.8}
+  .draw-insp-front .di-en{font-size:13px;line-height:1.7;opacity:.9}
+  .draw-close{position:fixed;top:26px;right:30px;color:#fff;font-size:34px;cursor:pointer;z-index:101;line-height:1}
+  .draw-hint{color:rgba(255,255,255,.8);font-size:13px;margin-top:16px;text-align:center;cursor:pointer}
+
+  /* ---------- 页脚 ---------- */
+  footer{background:#2b2b28;color:#b8b2a6;text-align:center;padding:30px 20px;font-size:13px}
+  footer b{color:#fff}
+
+  /* ---------- 语言切换按钮 ---------- */
+  .lang-btn{
+    margin-left:6px;padding:7px 16px;border-radius:999px;border:1.5px solid var(--accent);
+    background:#fff;color:var(--accent);font-weight:700;font-size:13px;cursor:pointer;
+    transition:all .2s;letter-spacing:1px;flex-shrink:0;
+  }
+  .lang-btn:hover{background:var(--accent);color:#fff}
+  .nav-game-btn{margin-left:6px;padding:7px 16px;border-radius:999px;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:13px;cursor:pointer;text-decoration:none;transition:all .2s;letter-spacing:.5px;flex-shrink:0;box-shadow:0 4px 14px rgba(47,111,106,.28)}
+  .nav-game-btn:hover{background:#265b57;transform:translateY(-1px)}
+  @media(max-width:760px){.nav-game-btn{padding:6px 12px;font-size:12px}}
+
+  /* ---------- 双灵感来源 ---------- */
+  .src-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  @media(max-width:900px){.src-grid{grid-template-columns:1fr}}
+  .src-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:28px 26px;position:relative;overflow:hidden}
+  .src-ribbon{position:absolute;top:0;left:0;right:0;height:6px}
+  .src-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:1px;padding:5px 14px;border-radius:999px;color:#fff}
+  .src-card h3{font-size:20px;font-weight:800;margin:14px 0 4px;letter-spacing:.5px}
+  .src-card .src-sub{font-size:12px;color:var(--ink-soft);margin-bottom:14px}
+  .src-card p{font-size:13.5px;color:var(--ink-soft);line-height:2;margin-bottom:12px}
+  .src-card p b{color:var(--ink)}
+  .src-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .src-chips span{font-size:12px;font-weight:600;padding:4px 12px;border-radius:999px;border:1px solid var(--line);color:var(--ink-soft);background:var(--bg-soft)}
+  .src-insight{margin-top:6px;border-radius:12px;padding:15px 18px}
+  .src-insight h4{font-size:14px;font-weight:800;margin-bottom:8px}
+  .src-insight p{font-size:13px;line-height:1.9;margin:0}
+  .src-adler .src-ribbon{background:linear-gradient(90deg,#2f6f6a,#4A9D8F)}
+  .src-adler .src-badge{background:#2f6f6a}
+  .src-adler .src-insight{background:#eaf3ee;border:1px solid #cfe3d8}
+  .src-adler .src-insight h4{color:#24524e}
+  .src-rainbow .src-ribbon{background:linear-gradient(90deg,#E57373,#FFB74D,#FFF176,#AED581,#64B5F6,#7986CB,#BA68C8)}
+  .src-rainbow .src-badge{background:#BA68C8}
+  .src-rainbow .src-insight{background:#f6eef9;border:1px solid #e6d3ee}
+  .src-rainbow .src-insight h4{color:#7b3f96}
+
+  /* 动画 */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+  .fade-up{animation:fadeUp .6s ease both}
+
+  /* 情境入口 */
+  .gate{background:linear-gradient(160deg,#fdfaf4,#eef4f1);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .gate-card{max-width:880px;margin:0 auto;text-align:center}
+  .tag{display:inline-block;font-size:13px;letter-spacing:3px;color:var(--accent);font-weight:700}
+  .gate-card .tag{margin-bottom:8px}
+  .gate-q{font-size:25px;font-weight:800;letter-spacing:1px;margin:4px 0 8px}
+  .gate-sub{font-size:14px;color:var(--ink-soft);margin-bottom:26px;max-width:560px;margin-left:auto;margin-right:auto}
+  .gate-chips{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+  .gate-chip{display:flex;flex-direction:column;align-items:center;gap:3px;background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:14px 16px;min-width:124px;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s}
+  .gate-chip:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(90,75,55,.12);border-color:var(--accent)}
+  .gate-chip .gt{font-size:14px;font-weight:700}
+  .gate-chip .ge{font-size:11px;color:var(--accent);font-weight:600}
+  .gate-or{margin-top:22px;font-size:12px;color:var(--ink-soft)}
+  .gate-or a{color:var(--accent);text-decoration:none;font-weight:600}
+
+  /* 灵感卡 UGC */
+  .ugc-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:920px;margin:0 auto}
+  @media(max-width:760px){.ugc-grid{grid-template-columns:1fr}}
+  .ugc-box{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px}
+  .ugc-box h3{font-size:17px;font-weight:800;margin-bottom:6px}
+  .ugc-box p{font-size:13px;color:var(--ink-soft);margin-bottom:14px;line-height:1.8}
+  .ugc-box textarea{width:100%;min-height:84px;border:1.5px solid var(--line);border-radius:12px;padding:12px;font-family:inherit;font-size:14px;resize:vertical;color:var(--ink);background:var(--bg-soft)}
+  .ugc-box textarea:focus{outline:none;border-color:var(--accent)}
+  .ugc-row{display:flex;gap:10px;align-items:center;margin-top:12px}
+  .ugc-saved{margin-top:16px;display:flex;flex-direction:column;gap:10px}
+  .ugc-item{background:var(--bg-soft);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.7;display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .ugc-item .del{color:var(--ink-soft);cursor:pointer;font-size:18px;line-height:1;border:none;background:none}
+  .ugc-recv{background:linear-gradient(160deg,#f3e9f7,#e7f0f7);border:1px solid #e0d2ec;border-radius:14px;padding:20px;min-height:120px;font-size:16px;line-height:2;color:var(--ink);display:flex;flex-direction:column;justify-content:center}
+  .ugc-recv .rl{font-size:11px;letter-spacing:1px;color:var(--ink-soft);font-weight:700;margin-bottom:8px}
+
+  /* 理论详情弹层 */
+  .src-btns{display:flex;gap:14px;justify-content:center;margin-top:22px;flex-wrap:wrap}
+  .theory-fixed{position:fixed;inset:0;background:rgba(58,53,48,.55);backdrop-filter:blur(6px);display:none;z-index:80;overflow:auto;padding:40px 16px}
+  .theory-fixed.show{display:block}
+  .theory-pop{position:relative;max-width:720px;margin:0 auto;background:var(--bg-soft);border-radius:20px;padding:34px 30px 38px;box-shadow:0 30px 70px rgba(40,30,20,.3)}
+  .theory-pop .close{position:absolute;top:14px;right:18px;font-size:26px;line-height:1;background:none;border:none;color:var(--ink-soft);cursor:pointer}
+  .theory-pop h3{font-size:24px;font-weight:800;letter-spacing:1px}
+  .theory-pop .tsub{font-size:13px;color:var(--ink-soft);margin:4px 0 18px}
+  .theory-pop .ttext{font-size:14px;line-height:2;color:var(--ink-soft);margin-bottom:16px}
+  .theory-pop .ttext b{color:var(--ink)}
+  .mmap{width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px;margin:6px 0 18px}
+  .theory-pop .tnote{font-size:13px;line-height:1.9;color:var(--ink-soft);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+
+  /* 引导弹层（从心情出发） */
+  .intro-fixed{position:fixed;inset:0;background:rgba(58,53,48,.55);backdrop-filter:blur(6px);display:none;z-index:90;overflow:auto;padding:40px 16px}
+  .intro-fixed.show{display:block}
+  .intro-pop{position:relative;max-width:880px;margin:0 auto;background:linear-gradient(160deg,#fdfaf4,#eef4f1);border:1px solid var(--line);border-radius:24px;padding:42px 30px 34px;text-align:center;box-shadow:0 30px 70px rgba(40,30,20,.3)}
+  .intro-pop .close{position:absolute;top:14px;right:18px;font-size:26px;line-height:1;background:none;border:none;color:var(--ink-soft);cursor:pointer}
+  .intro-pop .gate-q{font-size:25px}
+  .intro-pop .gate-sub{margin-bottom:26px}
+  .intro-bailey{margin-top:18px;font-size:12.5px;color:var(--ink-soft);font-style:italic}
+
+  /* UGC 字数提示 */
+  .ugc-meta{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:8px 0 14px;flex-wrap:wrap}
+  .ugc-count{font-size:12px;font-weight:700;color:var(--accent)}
+  .ugc-tip{font-size:11.5px;color:var(--ink-soft);line-height:1.5;flex:1;min-width:200px}
+  .ugc-box .btn-primary:disabled{opacity:.45;cursor:not-allowed}
+</style>
+</head>
+<body>
+
+<!-- ================= 导航 ================= -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-brand"><span class="dot"></span><span data-i18n="nav_brand">百灵卡 Bailey's Cards · 心理成长系列</span></div>
+    <div class="nav-links">
+      <a href="#sources" data-i18n="nav_sources">灵感来源</a>
+      <a href="#overview" data-i18n="nav_overview">项目概览</a>
+      <a href="#features" data-i18n="nav_features">核心亮点</a>
+      <a href="#box" data-i18n="nav_box">包装盒</a>
+      <a href="#cards" data-i18n="nav_cards">全部卡牌</a>
+      <a href="#rules" data-i18n="nav_rules">玩法规则</a>
+    </div>
+    <a class="nav-game-btn" href="./index.html" data-i18n="nav_game">Bailey's Island →</a>
+    <button class="lang-btn" id="langBtn" onclick="toggleLang()">EN</button>
+  </div>
+</nav>
+
+<!-- ================= Hero ================= -->
+<header class="hero">
+  <div class="fade-up">
+    <span class="kicker" data-i18n="hero_kicker">阿德勒心理学 × 彩虹卡 · 心理成长练习工具</span>
+    <h1 data-i18n="hero_title">课题分离练习卡牌
+      <span class="en">SEPARATION OF TASKS CARDS</span>
+    </h1>
+    <p class="sub" data-i18n="hero_sub">把别人的课题，还给别人<br>把自己的课题，握在自己手里</p>
+    <p class="desc" data-i18n="hero_desc">来自阿德勒心理学与彩虹卡的双重灵感：这是一副不考你、不说教的心理练习卡。用一句话、一个问句，帮 9 岁到 99 岁的人分清「这是谁的课题」——少一点内耗，多一点边界。另附 21 张灵感卡牌，随时抽一张，点亮心情。「百聆」即静心聆听——愿你在牌中听见自己的声音。</p>
+    <div class="hero-cta">
+      <button class="btn btn-primary" onclick="openDraw()" data-i18n="hero_cta1">随机抽一张试试</button>
+      <a class="btn btn-ghost" href="javascript:void(0)" onclick="openIntro()" data-i18n="hero_cta2">从今天的心情开始</a>
+    </div>
+    <div class="hero-badges">
+      <span data-i18n="hb1">中英双语</span>
+      <span data-i18n="hb2">9–99 岁全龄适用</span>
+      <span data-i18n="hb3">即开即用 · 无需安装</span>
+    </div>
+  </div>
+  <div class="hero-cards fade-up" style="animation-delay:.15s">
+    <div class="f-card fc1" data-i18n="fc1">情绪乱的时候<br>翻一翻</div>
+    <div class="f-card fc2" data-i18n="fc2">关系乱的时候<br>抽一张</div>
+    <div class="f-card fc3" data-i18n="fc3">每天 3 分钟<br>练习温柔的边界</div>
+    <div class="f-card fc5" data-i18n="fc5">灵感卡牌<br>点亮今天</div>
+    <div class="f-card fc4">
+      <div class="logo" data-i18n="fc4_logo">岛</div>
+      <h3 data-i18n="fc4_title">课题分离<br>练习卡牌</h3>
+      <div class="line"></div>
+      <p data-i18n="fc4_brand">百灵卡 Bailey's Cards</p>
+      <p data-i18n="fc4_series">心理成长系列</p>
+    </div>
+  </div>
+</header>
+
+<!-- ================= 情境入口已改为「首次打开引导弹层」(#introModal) ================= -->
+
+<!-- ================= 双灵感来源 ================= -->
+<section class="alt" id="sources">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="tag">TWO SOURCES OF INSPIRATION</div>
+      <h2 data-i18n="src_h2">双灵感来源</h2>
+      <p data-i18n="src_p">一副卡牌，两个源头：以阿德勒心理学为「骨」，以彩虹卡为「光」。两者篇幅相当、互相呼应，共同决定了这套卡牌的气质与内容。</p>
+      <div class="src-btns">
+        <button class="btn btn-primary" onclick="openTheory('adler')" data-i18n="src_btn_a">深入了解 · 阿德勒心理学</button>
+        <button class="btn btn-ghost" onclick="openTheory('rainbow')" data-i18n="src_btn_r">深入了解 · 彩虹卡</button>
+      </div>
+    </div>
+    <div class="src-grid">
+      <div class="src-card src-adler">
+        <div class="src-ribbon"></div>
+        <span class="src-badge" data-i18n="src_a_badge">理论基石 · 阿德勒心理学</span>
+        <h3 data-i18n="src_a_title">课题分离，来自阿德勒</h3>
+        <p class="src-sub" data-i18n="src_a_sub">个体心理学 · Alfred Adler</p>
+        <p data-i18n="src_a_p1">阿德勒（Alfred Adler）创立了个体心理学：人是不可分割的整体，思想、情感与行动彼此相连。他相信自卑感人人都有、并不可怕——它是成长的起点；人凭借「追求超越」的动力向前，不是要压过别人，而是成为更完整的自己。</p>
+        <div class="src-chips">
+          <span data-i18n="src_a_chip1">个体心理学</span>
+          <span data-i18n="src_a_chip2">自卑与超越</span>
+          <span data-i18n="src_a_chip3">社会兴趣</span>
+          <span data-i18n="src_a_chip4">目的论</span>
+          <span data-i18n="src_a_chip5">课题分离</span>
+        </div>
+        <p data-i18n="src_a_p2">「社会兴趣」提醒我们：真正的心理健康，在于与他人和社会的联结与贡献；「目的论」则说：我们不是被过去推着走，而是被今天自己选择的目标牵引。而「课题分离」，是这个体系里最锋利也最温柔的一把尺子——分清「这是谁的课题」，不替别人扛，也不让别人替我们活。</p>
+        <div class="src-insight">
+          <h4 data-i18n="src_insight_title">对创作的启发</h4>
+          <p data-i18n="src_a_insight">每一张课题卡的问句，都围绕「谁的课题」展开：结果由谁承担、我能控制什么、管下去我会不会累。卡牌把抽象理论，变成 9 岁到 99 岁都能用的一句话练习。</p>
+        </div>
+      </div>
+      <div class="src-card src-rainbow">
+        <div class="src-ribbon"></div>
+        <span class="src-badge" data-i18n="src_r_badge">情绪灵感 · 彩虹卡</span>
+        <h3 data-i18n="src_r_title">正向能量，来自彩虹卡</h3>
+        <p class="src-sub" data-i18n="src_r_sub">Rainbow Cards · Doris Wenzel</p>
+        <p data-i18n="src_r_p1">彩虹卡由德国艺术治疗师多丽丝·文策尔（Doris Wenzel）研发，由 245 张带有积极信念的卡片组成，涵盖红、橙、黄、绿、蓝、靛、紫七种颜色。每张卡片都写着一句智慧而肯定的话语，涉及情感、事业、自我认知、人际关系等层面。</p>
+        <div class="src-chips">
+          <span data-i18n="src_r_chip1">吸引力法则</span>
+          <span data-i18n="src_r_chip2">积极心理学</span>
+          <span data-i18n="src_r_chip3">七种颜色</span>
+          <span data-i18n="src_r_chip4">245 张</span>
+        </div>
+        <p data-i18n="src_r_p2">它的理论基础是吸引力法则与积极心理学：吸引力法则认为，积极的思想会吸引积极的经历——彩虹卡便用正面的语句帮使用者调整心态；积极心理学则研究人类积极品质与力量——卡片话语引导人们关注自身的优点与生活的美好。</p>
+        <div class="src-insight">
+          <h4 data-i18n="src_insight_title2">对创作的启发</h4>
+          <p data-i18n="src_r_insight">21 张灵感卡牌借鉴彩虹卡的形式：随机抽一张，读三遍，让一句肯定的话陪自己一会儿。它们不参与问答机制，只负责在你低落时，递上一束光。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 项目概览 ================= -->
+<section id="overview">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="tag">PROJECT OVERVIEW</div>
+      <h2 data-i18n="ov_h2">项目概览</h2>
+      <p data-i18n="ov_p">以阿德勒心理学「课题分离」为骨、以彩虹卡「正向肯定」为光，面向小学生到老年人的全龄段心理成长练习工具，87 张卡牌全部完成。</p>
+    </div>
+    <div class="stat-grid">
+      <div class="stat"><div class="num">87</div><div class="lab" data-i18n="ov_s1">张实体卡牌</div></div>
+      <div class="stat"><div class="num">8</div><div class="lab" data-i18n="ov_s2">大指引场景</div></div>
+      <div class="stat"><div class="num">4</div><div class="lab" data-i18n="ov_s3">套玩法体系</div></div>
+      <div class="stat"><div class="num">9+</div><div class="lab" data-i18n="ov_s4">适用年龄（无上限）</div></div>
+    </div>
+    <div class="principles">
+      <div class="principle"><div class="icon">👶</div><h4 data-i18n="pr1_title">人人能懂</h4><p data-i18n="pr1_text">全部文案用「天气、圈圈、窗户」等日常比喻替代心理学术语，三年级小学生也能读懂。</p></div>
+      <div class="principle"><div class="icon">💬</div><h4 data-i18n="pr2_title">句句好读</h4><p data-i18n="pr2_text">把「你应该」全部写成「你可以」；不说教、不给标准答案，只用问句引导自我觉察。</p></div>
+      <div class="principle"><div class="icon">🌈</div><h4 data-i18n="pr3_title">情绪补光</h4><p data-i18n="pr3_text">灵感卡牌不参与问答机制，只在你低落时递上一句肯定的话，像给心情开一盏小灯。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 核心亮点与适用场景 ================= -->
+<section class="alt" id="features">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="tag">KEY FEATURES</div>
+      <h2 data-i18n="feat_h2">核心亮点 · 一眼看懂这套牌</h2>
+      <p data-i18n="feat_p">六个维度说明这套卡牌为什么值得一看——无论你是来玩，还是来评审。</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat-card"><div class="f-icon">🃏</div><h4 data-i18n="feat1_t">87 张完整体系</h4><p data-i18n="feat1_b">45 张课题练习卡 + 21 张灵感卡，加上场景指引、规则与快速参考卡，构成从入门到深化的完整练习路径。</p></div>
+      <div class="feat-card"><div class="f-icon">🧭</div><h4 data-i18n="feat2_t">三问即上手</h4><p data-i18n="feat2_b">结果由谁承担？我能控制什么？管下去会累吗？一张快速参考卡，让任何人在一分钟内掌握课题分离的核心。</p></div>
+      <div class="feat-card"><div class="f-icon">📚</div><h4 data-i18n="feat3_t">理论有出处</h4><p data-i18n="feat3_b">以阿德勒个体心理学为骨、彩虹卡正向肯定为光，每一张卡都能回溯到具体理论概念，可查证、可讨论。</p></div>
+      <div class="feat-card"><div class="f-icon">👨‍👩‍👧‍👦</div><h4 data-i18n="feat4_t">全龄段适配</h4><p data-i18n="feat4_b">9 岁到 99 岁都能用：孩子读得懂、老人看得清；一个人练、一家人玩、课堂上用，都有对应玩法。</p></div>
+      <div class="feat-card"><div class="f-icon">🌏</div><h4 data-i18n="feat5_t">中英双语</h4><p data-i18n="feat5_b">全部卡牌与规则均为中英双语，适合国际交流、英语课堂与跨文化分享，右上角一键切换。</p></div>
+      <div class="feat-card"><div class="f-icon">🖱️</div><h4 data-i18n="feat6_t">交互式数字演示</h4><p data-i18n="feat6_b">本页即产品本身：点击翻转卡片、随机抽一张、随时切换语言，无需安装即可完整体验。</p></div>
+    </div>
+    <div class="scn-band">
+      <h3 data-i18n="scn_h3">适用场景 · 谁在用这套牌</h3>
+      <div class="scn-grid">
+        <div class="scn-item"><div class="scn-ico">🧘</div><div class="scn-t" data-i18n="scn1_t">一个人 · 自我觉察</div><div class="scn-b" data-i18n="scn1_b">每天睡前 3 分钟，抽一张卡，问自己一个问题。</div></div>
+        <div class="scn-item"><div class="scn-ico">💞</div><div class="scn-t" data-i18n="scn2_t">两个人 · 关系沟通</div><div class="scn-b" data-i18n="scn2_b">情侣、亲子、朋友之间，用卡牌打开平时不敢说的话。</div></div>
+        <div class="scn-item"><div class="scn-ico">🏠</div><div class="scn-t" data-i18n="scn3_t">一家人 · 睡前共读</div><div class="scn-b" data-i18n="scn3_b">晚饭后围坐一圈，轮流抽卡，听听彼此的故事。</div></div>
+        <div class="scn-item"><div class="scn-ico">🏫</div><div class="scn-t" data-i18n="scn4_t">课堂与团体 · 心理教育</div><div class="scn-b" data-i18n="scn4_b">心理课、班会、社团活动，用卡牌练习边界、沟通与自我价值。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 包装盒 ================= -->
+<section id="box">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="tag">PACKAGING</div>
+      <h2 data-i18n="box_h2">包装盒设计</h2>
+      <p data-i18n="box_p">盒面 / 盒背 / 盒侧三面文字，均已按印刷排版要求设计。</p>
+    </div>
+    <div class="box-grid">
+      <div class="box-item">
+        <div class="box-label">盒面 · FRONT</div>
+        <div class="box-face"><div class="box-face-inner">
+          <div class="side-top" data-i18n="box_f_top">百灵卡 Bailey's Cards · 心理成长系列</div>
+          <h3 data-i18n="box_f_h3">课题分离练习卡牌</h3>
+          <div class="en">SEPARATION OF TASKS CARDS</div>
+          <div class="divider"></div>
+          <p data-i18n="box_f_p">把别人的课题，还给别人<br>把自己的课题，握在自己手里</p>
+          <div class="corner">Bailey's Island</div>
+        </div></div>
+      </div>
+      <div class="box-item">
+        <div class="box-label">盒背 · BACK</div>
+        <div class="box-face"><div class="box-face-inner">
+          <div class="side-top" data-i18n="box_b_top">产品简介</div>
+          <p data-i18n="box_b_p">这是一副以阿德勒心理学为骨、以彩虹卡为光的练习卡牌。它用一句话、一个问句，帮你分清「这是谁的课题」——别人的情绪、选择、评价，不必都背在自己身上。情绪乱时翻一翻，关系乱时抽一张，每天 3 分钟，练习温柔而清晰的边界。另含 21 张灵感卡牌，低落时随手抽一张，获得一句正向能量。</p>
+        </div></div>
+        <div class="box-list">
+          <b data-i18n="box_b_list1">八大指引场景：</b><span data-i18n="box_b_list1v">关于 · 心理困境 · 边界判断 · 自我认知 · 亲密关系 · 自我价值 · 原生家庭影响 · 灵感卡牌</span><br>
+          <b data-i18n="box_b_list2">适用人群：</b><span data-i18n="box_b_list2v">想少一点内耗的你 ｜ 9 岁以上所有人 ｜ 一个人、两个人、一家人都能玩</span>
+        </div>
+      </div>
+      <div class="box-item">
+        <div class="box-label">盒侧 · SIDE</div>
+        <div class="box-face"><div class="box-face-inner side">
+          <div class="side-top" data-i18n="box_s_top">— 百灵卡 Bailey's Cards —</div>
+          <p style="margin-top:16px;font-size:14px;font-weight:700;line-height:2" data-i18n="box_s_p1">别人的课题，不必由你背负。</p>
+          <p style="font-size:13px;line-height:2" data-i18n="box_s_p2">愿你在混乱时找到方向，在关系里拥有边界。</p>
+          <div class="corner">Bailey's Island</div>
+        </div></div>
+        <div class="box-list">
+          <b data-i18n="box_s_list">盒内包含：</b><span data-i18n="box_s_listv">规则卡 ×3 ｜ 快速参考卡 ×1 ｜ 场景指引卡 ×8 ｜ 课题练习卡 ×45 ｜ 模块练习卡 ×7 ｜ 灵感卡牌 ×21 ｜ 空白卡 ×2</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 全部卡牌 ================= -->
+<section class="alt" id="cards">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="tag">ALL CARDS · 次级入口</div>
+      <h2 data-i18n="cards_h2">全部卡牌 · 慢慢逛（按模块浏览）</h2>
+      <p data-i18n="cards_p">这是「按概念」的次级入口。先有具体困扰？<a href="javascript:void(0)" onclick="openIntro()" style="color:var(--accent);font-weight:600">从你的心情出发 →</a><br>点击任意卡牌可翻转：<b>课题卡</b>正面＝卡名＋解释，背面＝问句＋提醒；<b>灵感卡</b>正面＝中英肯定句，背面＝使用提示。</p>
+    </div>
+    <div class="mod-tabs" id="modTabs"></div>
+    <div class="mod-note" id="modNote"></div>
+    <div class="card-grid" id="cardGrid"></div>
+  </div>
+</section>
+
+<!-- ================= 灵感卡 UGC ================= -->
+<section id="ugc">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="tag">MAKE IT TOGETHER</div>
+      <h2 data-i18n="ugc_h2">写下一句话 · 传给另一个人</h2>
+      <p data-i18n="ugc_p">灵感卡不只是固定的 21 张。把一句你曾听到过、或很想送给别人的温暖的话写下来——它会被存进你的设备；也可以抽一张「陌生人的一句话」，当作今天小小的连接。</p>
+    </div>
+    <div class="ugc-grid">
+      <div class="ugc-box">
+        <h3 data-i18n="ugc_write_t">写下一句话</h3>
+        <p data-i18n="ugc_write_p">存在你自己设备上，随时回来读。也可以送给某个你想起的人。</p>
+        <textarea id="ugcInput" maxlength="60" placeholder="例如：你今天已经很努力了，这就够了。" oninput="onUgcInput()"></textarea>
+        <div class="ugc-meta">
+          <span class="ugc-count" id="ugcCount" data-i18n="ugc_count">0/60</span>
+          <span class="ugc-tip" data-i18n="ugc_tip">一句话就好 · 不超过 60 字 · 请勿留下个人信息或不当内容</span>
+        </div>
+        <div class="ugc-row">
+          <button class="btn btn-primary" id="ugcSaveBtn" onclick="saveUgc()" data-i18n="ugc_save" disabled>存下来</button>
+          <span id="ugcMsg" style="color:var(--accent);font-size:13px"></span>
+        </div>
+        <div class="ugc-saved" id="ugcSaved"></div>
+      </div>
+      <div class="ugc-box">
+        <h3 data-i18n="ugc_recv_t">收到陌生人的一句话</h3>
+        <p data-i18n="ugc_recv_p">点一下，随机来一句。它也许来自某个人曾经的温柔。</p>
+        <div class="ugc-recv" id="ugcRecv"><span class="rl" data-i18n="ugc_recv_l">FROM SOMEONE</span><span id="ugcRecvText">—</span></div>
+        <div class="ugc-row">
+          <button class="btn btn-ghost" onclick="showReceived()" data-i18n="ugc_recv_btn">再抽一张</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 玩法规则 ================= -->
+<section id="rules">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="tag">HOW TO PLAY</div>
+      <h2 data-i18n="rules_h2">玩法规则</h2>
+      <p data-i18n="rules_p">三种独处玩法 + 三种家庭玩法 + 灵感卡牌玩法，一个人可以练，一家人也能玩。</p>
+    </div>
+    <div class="rules-grid">
+      <div class="rule-item">
+        <h4><span class="rn">1</span><span data-i18n="rule1_t">这是一副什么样的牌</span></h4>
+        <div class="rbody" data-i18n="rule1_b">这不是游戏卡，是你的「心理练习卡」。它不考你、不说教、不给标准答案，只在你情绪乱的时候，帮你停下来想一想：<b>此刻这件事，到底是谁的课题？</b><br><br>卡片上的字，不用背、不用记。翻开时慢一点读，读到哪一句让你心里一动，就停在那张卡上，多待一会儿。</div>
+      </div>
+      <div class="rule-item">
+        <h4><span class="rn">2</span><span data-i18n="rule2_t">三种独处玩法</span></h4>
+        <div class="rbody" data-i18n="rule2_b"><b>玩法一 · 情绪急救</b>：心里堵、气不顺时，找到最像你处境的卡，问三句话——①这是谁的课题？②我能控制什么？③我能为自己做的一小步是什么？<br><br><b>玩法二 · 觉察练习</b>：每天睡前抽 1 张，想一想今天有没有类似的事，连续 7 天，认出自己的老模式。<br><br><b>玩法三 · 日常抽牌</b>：早晨随机抽 1 张作为今天的「课题提醒」，或挑一张放在床头、手机壳里陪自己。</div>
+      </div>
+      <div class="rule-item">
+        <h4><span class="rn">3</span><span data-i18n="rule3_t">大家一起玩（家庭版）</span></h4>
+        <div class="rbody" data-i18n="rule3_b"><b>玩法 A · 故事接龙</b>（2~6 人）：轮流抽卡讲一件自己的小事，下一个人问：「如果是你，会怎么分这个课题？」不许打断，不许评判。<br><br><b>玩法 B · 课题小法庭</b>：一人抽卡念出场景，其他人举手投票「这是谁的课题」，听听彼此的理由。<br><br><b>玩法 C · 今天夸自己</b>：每人抽一张卡，说出自己今天「做得好的一个小地方」，其他人补充夸。</div>
+      </div>
+      <div class="rule-item">
+        <h4><span class="rn">4</span><span data-i18n="rule4_t">灵感卡牌玩法（无机制）</span></h4>
+        <div class="rbody" data-i18n="rule4_b"><b>玩法 D · 点亮心情</b>：情绪低落、卡住、没有能量时，从灵感卡牌里随机抽 1 张，读三遍这句话，感受它进入身体。<br><br><b>玩法 E · 当天的能量句</b>：早晨刚醒或需要勇气时抽一张，把它作为今天的「主题句」，可以写在手机备忘录里或放在桌面上。<br><br><b>玩法 F · 送给身边的人</b>：看到朋友低落时，替他抽一张灵感卡递过去，说一句：「这张卡想送给你。」</div>
+      </div>
+    </div>
+    <div class="insp-rule">
+      <h4 data-i18n="insp_h4">🌈 灵感卡牌说明</h4>
+      <p data-i18n="insp_p">灵感卡牌是这副牌的「情绪补光」：它们不参与课题分离的问答机制，不比较对错，只负责在你需要的时候递上一句肯定。抽到后不必分析，只需读、感受、让这句话陪你一会儿。</p>
+    </div>
+    <div class="quick-card">
+      <div>
+        <h4 data-i18n="quick_h4">🃏 快速参考卡 · 课题分离三问</h4>
+        <ol>
+          <li data-i18n="quick_q1">这件事的结果，最终由谁承担？</li>
+          <li data-i18n="quick_q2">这件事，我能控制的部分是什么？</li>
+          <li data-i18n="quick_q3">如果我一直管，我自己会累吗？</li>
+        </ol>
+        <p style="font-size:14px;font-weight:700;color:var(--ink);margin-top:10px" data-i18n="quick_tag">谁的课题，谁做主；谁能控制，谁负责。</p>
+      </div>
+      <div class="qc-right">
+        <b data-i18n="qc_b1">一句话记住它：</b><br>
+        <span data-i18n="qc_b1v">别人的情绪、选择、评价 → <b>还回去</b><br>自己的感受、行动、责任 → <b>接过来</b></span><br><br>
+        <b data-i18n="qc_b2">小提醒：</b><span data-i18n="qc_b2v">分课题不是不管别人，而是「我关心你，但不替你活」。</span>
+      </div>
+    </div>
+    <div style="margin-top:20px;background:#fdf6e9;border:1px solid #ecd9a8;border-radius:14px;padding:16px 20px;font-size:13px;color:#7a6a45;line-height:2" data-i18n="notice"><b>使用须知：</b>① 不评判、不纠正——说「我听到你了」，而不是「你这样不对」。② 没有标准答案——卡牌是镜子，不是裁判。③ 孩子参与时，由孩子先讲，大人先听。④ 情绪太大时先暂停——拥抱比讲道理更有用。⑤ 本卡牌是成长工具，<b>不能替代专业心理咨询</b>；若长期困扰，请寻求专业帮助。</div>
+  </div>
+</section>
+
+<!-- ================= 页脚 ================= -->
+<footer>
+  <span data-i18n="footer"><b>课题分离练习卡牌</b> · 数字演示版 v4.0<br>百灵卡 Bailey's Cards · 心理成长系列 ｜ 阿德勒心理学 × 彩虹卡 ｜ 87 张卡牌 · 中英双语</span>
+</footer>
+
+<!-- ================= 抽牌 Modal ================= -->
+<div class="draw-fixed" id="drawModal" onclick="this.classList.remove('show')">
+  <span class="draw-close" onclick="document.getElementById('drawModal').classList.remove('show')">×</span>
+  <div style="text-align:center">
+    <div class="draw-stage" id="drawStage" onclick="flipDraw()">
+      <div class="draw-card">
+        <div class="draw-face draw-back">
+          <div class="logo">B</div>
+          <p data-i18n="draw_p">抽一张 · 陪自己一会儿</p>
+        </div>
+        <div class="draw-face draw-front" id="drawFront"></div>
+      </div>
+    </div>
+    <div class="draw-hint" id="drawHint" data-i18n="draw_hint_open">点卡片翻开 →</div>
+  </div>
+</div>
+
+<script>
+/* ==================== 数据 ==================== */
+const MODULE_COLORS = {
+  about:'#E07A5F', distress:'#6B7A99', boundary:'#4A9D8F', self:'#E9B44C',
+  relation:'#C86B85', worth:'#8B7BB8', family:'#7A8B5C', inspiration:'#BA68C8'
+};
+const INSPIRE_COLORS = [
+  '#E57373','#FFB74D','#FFF176','#AED581','#64B5F6','#7986CB','#BA68C8'
+];
+const INSPIRATIONS = [
+  {zh:'我总是有足够的时间做任何想做的事。', en:'I always have enough time to do everything I want.'},
+  {zh:'全新的旅程开始了！', en:'A brand new journey begins TODAY!'},
+  {zh:'我本身就有无限可能。', en:'I have limitless potential.'},
+  {zh:'我相信每一件发生在我身上的事，都是生命赋予的礼物。', en:'I believe that everything that happens to me is a gift from life.'},
+  {zh:'宇宙永远对我说 Yes！', en:'The universe always says "Yes" to me.'},
+  {zh:'当我真心渴望某样东西，整个宇宙都会联合起来帮助我实现。', en:'When I want something, all the universe conspires in helping me to achieve it.'},
+  {zh:'我允许自己慢慢来，也允许自己闪闪发光。', en:'I allow myself to go slowly, and I allow myself to shine.'},
+  {zh:'我的存在本身就是一种价值。', en:'My existence itself is valuable.'},
+  {zh:'今天，我选择温柔地对待自己。', en:'Today, I choose to be gentle with myself.'},
+  {zh:'我有勇气说不，也有能力说好。', en:'I have the courage to say no, and the ability to say yes.'},
+  {zh:'我值得拥有被爱和被尊重的关系。', en:'I deserve relationships filled with love and respect.'},
+  {zh:'每一次呼吸，都是一次新的开始。', en:'Every breath is a fresh start.'},
+  {zh:'我不需要完美，也值得被喜欢。', en:'I don\'t need to be perfect to be loved.'},
+  {zh:'我的感受很重要，我会认真听它说。', en:'My feelings matter, and I will listen to them.'},
+  {zh:'我信任自己正在走的这条路。', en:'I trust the path I am on.'},
+  {zh:'我有力量把混乱的日子过成诗。', en:'I have the power to turn chaotic days into poetry.'},
+  {zh:'我愿意给自己多一点耐心。', en:'I am willing to give myself more patience.'},
+  {zh:'我正在成为我想成为的人。', en:'I am becoming the person I want to be.'},
+  {zh:'我感恩此刻拥有的一切。', en:'I am grateful for everything I have right now.'},
+  {zh:'我可以害怕，也可以勇敢。', en:'I can be scared and brave at the same time.'},
+  {zh:'今天，我做自己的太阳。', en:'Today, I am my own sunshine.'}
+];
+const MODULES = [
+  {
+    id:'about', color:'#E07A5F',
+    name:{zh:'关于', en:'The Basics'},
+    note:{zh:'入门模块 · 先认识「课题分离」这个概念，3 张卡打基础', en:'Starter module · meet "task separation" with 3 foundation cards'},
+    guide:{
+      title:{zh:'开始之前，认识两个词', en:'Before you start, two words'},
+      text:{zh:'「课题」，就是「该谁负责的那件事」。「课题分离」，就是把「我的事」和「别人的事」分开。人生大部分烦恼，都来自把别人的课题，背在自己身上。', en:'A "task" is "the thing someone is responsible for." "Task separation" means telling apart "my business" from "others\' business." Most of life\'s worries come from carrying others\' tasks on our own backs.'},
+      back:{zh:'先读这 3 张卡，再开始练习：① 什么是课题分离 ② 分离≠冷漠 ③ 分离，是为了更好地靠近', en:'Read these 3 cards first, then practice: ① what task separation is ② separation ≠ indifference ③ separation brings us closer'}
+    },
+    cards:[
+      {no:'01',zh:{title:'什么是课题分离',text:'课题分离，就是把每件事分成两种：「我的事」和「别人的事」。别人的情绪、选择、评价，归别人；我的感受、行动、责任，归我。',q:'想一想：此刻让我烦恼的这件事，是「我的事」还是「别人的事」？',tip:'分清之后，肩膀会轻一点。'},en:{title:'What is task separation',text:'Task separation means sorting everything into two kinds: "my business" and "others\' business." Others\' emotions, choices, and judgments are theirs; my feelings, actions, and responsibilities are mine.',q:'Think: the thing troubling me right now — is it "my business" or "theirs"?',tip:'Once separated, your shoulders feel lighter.'}},
+      {no:'02',zh:{title:'分离≠冷漠',text:'分课题，不等于不管别人。我可以关心你、倾听你、陪着你，但你的情绪，不用由我来「背」。关心是走近，背负是越界。',q:'问自己：我是「在关心」，还是「在替他扛」？',tip:'扛别人的担子，不是爱的证明。'},en:{title:'Separation ≠ indifference',text:'Separating tasks does not mean not caring. I can care, listen, and stay with you — but your emotions are not mine to "carry." Caring draws us near; carrying crosses the line.',q:'Ask yourself: am I "caring" or "carrying for him"?',tip:'Bearing someone else\'s load is not proof of love.'}},
+      {no:'03',zh:{title:'分离，是为了更好地靠近',text:'两个人都做自己的课题，关系反而更轻松、更长久。我不替你活，你也别替我活，我们才能好好地并肩走。',q:'想一想：有没有一段关系，因为「管太多」而变累？试着退半步。',tip:'边界不是墙，是让我们都能呼吸的窗户。'},en:{title:'Separation brings us closer',text:'When both people do their own tasks, the relationship becomes lighter and lasts longer. I don\'t live your life, and you don\'t live mine — only then can we truly walk side by side.',q:'Think: is there a relationship that grew heavy because someone "managed too much"? Try stepping back.',tip:'A boundary is not a wall; it is a window we can both breathe through.'}}
+    ],
+    practice:{
+      title:{zh:'本周小练习 · 分课题小实验', en:'This week · The task-sorting experiment'},
+      text:{zh:'这周遇到烦心事时，先在心里喊一声「停」：这是谁的课题？然后翻到对应的卡，把上面的问句问一遍自己。', en:'When something bothers you this week, first call "stop" inside: whose task is this? Then find the matching card and ask yourself its question.'},
+      back:{zh:'一周后问问自己：分课题这件事，我做得更顺、心里更轻了吗？', en:'After a week, ask yourself: does sorting tasks come more smoothly now, and do I feel lighter?'}
+    }
+  },
+  {
+    id:'distress', color:'#6B7A99',
+    name:{zh:'心理困境', en:'Emotional Struggles'},
+    note:{zh:'找出混进心里的那件「别人的事」，把心里的线一根根理清', en:'Find the "other person\'s business" tangled inside you, and sort the threads one by one'},
+    guide:{
+      title:{zh:'内耗，是课题搅在了一起', en:'Inner friction: tasks tied in knots'},
+      text:{zh:'内耗、纠结、委屈、放不下……这些「心里打架」的时刻，多半是课题搅在了一起：别人的事，混进了我的心。本模块帮你：认出困境，找出那件混进来的「别人的事」。', en:'Draining, tangled, hurt, unable to let go... these "battles inside" usually mean tasks got knotted together: someone else\'s business slipped into your heart. This module helps you name the struggle and spot the "other person\'s business" that slipped in.'},
+      back:{zh:'翻到最像你现在处境的卡，用背面的问句，把心里的线一根根理清。', en:'Flip to the card closest to where you are, and use the question on its back to sort the threads one by one.'}
+    },
+    cards:[
+      {no:'04',zh:{title:'情绪内耗',text:'同一件事，在脑子里翻来覆去想一百遍，越想越累，事情却没变——这就是内耗。内耗，是把别人的课题搬进自己心里反复摩擦。',q:'问自己：我此刻在反复想的事，是谁的课题？',tip:'想一百遍不如做一小步。'},en:{title:'Emotional drain',text:'Going over the same thing a hundred times in your head, growing wearier while nothing changes — that is inner friction. It is rubbing someone else\'s task against your own heart.',q:'Ask yourself: the thing I keep replaying — whose task is it?',tip:'Thinking 100 times beats taking one small step.'}},
+      {no:'05',zh:{title:'过度负责',text:'什么事都往自己身上揽，别人没开口，你已经觉得「是我的责任」。负责是美德，过度负责是疲惫的开始。',q:'问自己：这件事，真的是「该我」的吗？',tip:'你不需要为所有人的心情买单。'},en:{title:'Over-responsibility',text:'Taking everything onto yourself — before anyone even asks, you already feel "it\'s my responsibility." Responsibility is a virtue; over-responsibility is where exhaustion begins.',q:'Ask yourself: is this really "mine to handle"?',tip:'You don\'t have to pay for everyone\'s mood.'}},
+      {no:'06',zh:{title:'拯救者心态',text:'总想「拉别人一把」：他难过，我要让他好起来；他走错路，我要把他拽回来。可每个人的人生，都有自己的课题要修。',q:'问自己：他需要我的「拯救」，还是我的「陪伴」？',tip:'你能给的，是支持，不是替他活。'},en:{title:'Savior mindset',text:'Always wanting to "pull people up": he\'s sad, so I must fix him; he\'s off track, so I must drag him back. But every life has its own tasks to work through.',q:'Ask yourself: does he need my "rescue" or my company?',tip:'What you can offer is support, not a life lived for him.'}},
+      {no:'07',zh:{title:'讨好型人格',text:'怕别人不高兴，就委屈自己；怕被讨厌，就先说「好」。讨好，是把「让别人舒服」当成了自己的课题。',q:'问自己：我这样做，是心甘情愿，还是怕被讨厌？',tip:'让别人舒服之前，先让自己舒服。'},en:{title:'People-pleasing',text:'Afraid others will be upset, you shrink yourself; afraid of being disliked, you say "yes" first. Pleasing makes "keeping others comfortable" your task.',q:'Ask yourself: am I doing this willingly, or out of fear of being disliked?',tip:'Before making others comfortable, be comfortable yourself.'}},
+      {no:'08',zh:{title:'完美主义',text:'总觉得「不够好」，改了又改，迟迟不敢开始。完美是别人的课题，尽力是你的课题。完成，比完美更重要。',q:'问自己：如果只做到「够好」，我敢不敢交出去？',tip:'完美主义者真正怕的，是别人的评价。'},en:{title:'Perfectionism',text:'Always feeling "not good enough," revising again and again, never daring to begin. Perfection is others\' task; doing your best is yours. Done beats perfect.',q:'Ask yourself: if "good enough" were the goal, would I dare to ship it?',tip:'What perfectionists truly fear is others\' judgment.'}},
+      {no:'09',zh:{title:'习惯性自责',text:'事情一不如意，第一反应就是「都怪我」。把别人的责任也揽到自己身上，是另一种越界。错了就改，改了就好，不必罚自己三天。',q:'问自己：这件事里，我真正该负责的部分是什么？',tip:'自责不是负责，改正才是。'},en:{title:'Habitual self-blame',text:'When things go wrong, your first reaction is "it\'s all my fault." Taking on others\' responsibility is another kind of boundary crossing. Fix what you can and move on — no need to punish yourself for three days.',q:'Ask yourself: what part of this am I truly responsible for?',tip:'Self-blame is not responsibility; making it right is.'}},
+      {no:'10',zh:{title:'放不下',text:'已经过去的事，还在心里反复回放；已经结束的关系，还舍不得转身。放不下，是因为把「他的课题」也当成了「我的课题」。',q:'问自己：我还放不下的是人，还是「我本可以」？',tip:'告别不是失败，是给新故事腾地方。'},en:{title:'Can\'t let go',text:'Past events keep replaying; finished relationships you can\'t turn away from. Holding on means you\'ve taken "his task" as "my task."',q:'Ask yourself: is it the person I can\'t let go of, or the "I could have"?',tip:'Saying goodbye is not failure — it makes room for a new story.'}}
+    ],
+    practice:{
+      title:{zh:'本周小练习 · 给情绪贴标签', en:'This week · Label your emotions'},
+      text:{zh:'每天睡前，用一句话写下今天的情绪，例如：「今天妈妈批评我，我很难过。」然后问：这个难过里，有多少是「我的事」，有多少是「别人的事」？', en:'Before bed each day, write today\'s emotion in one sentence — e.g., "Mom criticized me today, and I feel sad." Then ask: how much of this sadness is "my business," and how much is "theirs"?'},
+      back:{zh:'连续 7 天，你会发现：同一件事，想通了课题，情绪就轻了一半。', en:'After 7 days you\'ll find: once you sort out the task, the emotion weighs half as much.'}
+    }
+  },
+  {
+    id:'boundary', color:'#4A9D8F',
+    name:{zh:'边界判断', en:'Boundary Check'},
+    note:{zh:'一把尺子量到底：谁承担结果，就是谁的课题', en:'One ruler settles it: whoever bears the outcome owns the task'},
+    guide:{
+      title:{zh:'谁是课题的裁判？用一把尺子', en:'Who judges a task? Use one ruler'},
+      text:{zh:'什么是我的课题？谁说了算？有个简单的尺子：谁承担结果，就是谁的课题。本模块帮你：随时量出人际关系的边界。', en:'What is my task? Who decides? There is a simple ruler: whoever bears the outcome owns the task. This module helps you measure relationship boundaries anytime.'},
+      back:{zh:'翻到最像你处境的卡，用「谁承担结果」这把尺子量一量。', en:'Flip to the card closest to your situation, and measure it with the "who bears the outcome" ruler.'}
+    },
+    cards:[
+      {no:'11',zh:{title:'谁承担结果，就是谁的课题',text:'判断课题归属，只看一件事：这件事的后果，最后落在谁身上？他考试没考好，难受的是他——那是他的课题；你该做的作业没做，挨批的是你——那是你的课题。',q:'问自己：这件事的结果，最终由谁承担？',tip:'这是全副卡牌最重要的一把尺子。'},en:{title:'Who bears the outcome owns the task',text:'To judge who owns a task, look at one thing: who ends up carrying the consequence? He failed the exam — he suffers, so it\'s his task; you skipped your homework — you get scolded, so it\'s yours.',q:'Ask yourself: who ultimately bears the outcome of this?',tip:'This is the most important ruler in the whole deck.'}},
+      {no:'12',zh:{title:'我能控制的圈',text:'把烦恼的事画个圈：圈外是「我管不了的」——别人的看法、天气、结果；圈内是「我能控制的」——我的行动、我的态度、我的选择。只操心圈内的事，心就定了。',q:'问自己：这件事，落在我的圈内还是圈外？',tip:'管不了的事，放下，不算失败。'},en:{title:'The circle I can control',text:'Draw a circle around the worry: outside it — "things I can\'t control": others\' opinions, the weather, outcomes; inside it — "what I can control": my actions, my attitude, my choices. Care only about the inside, and your mind settles.',q:'Ask yourself: does this fall inside my circle or outside?',tip:'Letting go of what you can\'t control is not failure.'}},
+      {no:'13',zh:{title:'帮忙与越界',text:'帮忙是：他需要，我做，他也愿意；越界是：他没要，我做，还觉得「为他好」。帮不帮是你的自由，他怎么活是他的课题。',q:'问自己：我是在帮忙，还是在替他做主？',tip:'真正的帮忙，是尊重他的选择权。'},en:{title:'Helping vs. overstepping',text:'Helping is: he needs it, I do it, and he welcomes it. Overstepping is: he didn\'t ask, I do it anyway, and call it "for his own good." Whether to help is your freedom; how he lives is his task.',q:'Ask yourself: am I helping, or deciding for him?',tip:'Real help respects his right to choose.'}},
+      {no:'14',zh:{title:'拒绝不等于伤害',text:'说「不」，是每个人的权利。别人因为被拒绝而不高兴，那是「他的情绪」，不是「我的错」。温和地拒绝，是边界发出的声音。',q:'问自己：我拒绝他，会伤到他，还是会伤到他的面子？',tip:'照顾别人感受之前，先守住自己的底线。'},en:{title:'Saying no is not hurting',text:'Saying "no" is everyone\'s right. If someone is upset by your refusal, that\'s "his emotion," not "your fault." A gentle no is the voice of a healthy boundary.',q:'Ask yourself: would my refusal hurt him, or just his pride?',tip:'Hold your own line before tending to others\' feelings.'}},
+      {no:'15',zh:{title:'别人生气，不代表我错了',text:'他脸色一沉，你就开始检讨自己——可他的情绪，是他内心的天气，不是你的成绩单。你没有做错，就不必为他的暴风雨负责。',q:'问自己：他的生气，是我造成的，还是他自己的？',tip:'情绪是别人的天气，你能管的是自己的伞。'},en:{title:'Their anger doesn\'t mean you\'re wrong',text:'His face darkens and you start blaming yourself — but his mood is the weather inside him, not your report card. If you did nothing wrong, you don\'t owe his storm anything.',q:'Ask yourself: did I cause his anger, or is it his own?',tip:'Emotions are others\' weather; your umbrella is what you control.'}},
+      {no:'16',zh:{title:'区分分离与关心',text:'分离和关心，并不冲突：你的情绪是你的，我依然在乎你；你的选择是你的，我依然支持你。「我关心你」和「我不替你扛」，可以同时成立。',q:'问自己：我能不能一边关心，一边不替他扛？',tip:'温柔的边界，是给关系最好的礼物。'},en:{title:'Separation and care can coexist',text:'Separation and care don\'t conflict: your emotions are yours, and I still care; your choices are yours, and I still support you. "I care about you" and "I won\'t carry it for you" can both be true.',q:'Ask yourself: can I care without carrying for him?',tip:'A gentle boundary is the best gift a relationship can get.'}},
+      {no:'17',zh:{title:'别人的期待',text:'父母的期望、老师的要求、朋友的眼光……别人的期待，是别人的课题；要不要满足，是你的课题。满足是情分，不满足也理直气壮。',q:'问自己：我在满足他，还是我在害怕他失望？',tip:'你活着，不是为了演好别人写的剧本。'},en:{title:'Others\' expectations',text:'Parents\' hopes, teachers\' demands, friends\' eyes... others\' expectations are their task; whether to fulfill them is yours. Fulfilling is kindness, not obligation.',q:'Ask yourself: am I meeting his need, or fearing his disappointment?',tip:'You\'re not here to perform someone else\'s script.'}}
+    ],
+    practice:{
+      title:{zh:'本周小练习 · 边界小尺子', en:'This week · The boundary ruler'},
+      text:{zh:'遇到拿不定主意的事，问自己三个问题：① 谁承担结果？② 我能控制什么？③ 我是心甘情愿，还是被迫答应？', en:'When you can\'t decide, ask three questions: ① Who bears the outcome? ② What can I control? ③ Am I willing, or forced?'},
+      back:{zh:'把一个「想拒绝却没拒绝」的时刻写下来，想想下一次，你准备怎么说。', en:'Write down a moment you wanted to say no but didn\'t — and plan what you\'ll say next time.'}
+    }
+  },
+  {
+    id:'self', color:'#E9B44C',
+    name:{zh:'自我认知', en:'Self-Awareness'},
+    note:{zh:'从「别人怎么看我」回到「我怎么看自己」', en:'From "how others see me" back to "how I see myself"'},
+    guide:{
+      title:{zh:'课题分离的终点，是遇见自己', en:'Task separation ends in meeting yourself'},
+      text:{zh:'我是谁？我要什么？我为什么总这样反应？看清自己，才不会被别人的课题牵着走。本模块帮你：从「别人怎么看我」回到「我怎么看自己」。', en:'Who am I? What do I want? Why do I always react this way? Seeing yourself clearly keeps you from being pulled by others\' tasks. This module helps you return from "how others see me" to "how I see myself."'},
+      back:{zh:'翻到最像你的卡，像照镜子一样读它。', en:'Flip to the card that feels most like you, and read it like a mirror.'}
+    },
+    cards:[
+      {no:'18',zh:{title:'我是谁，不由评价决定',text:'别人夸你，你就飘；别人说你，你就塌——那你的人生，就交给了别人的嘴。评价是别人的课题，你是怎样的人，是自己的课题。',q:'问自己：抛开所有评价，我觉得自己是个怎样的人？',tip:'别人的评价会变，你的内核不用变。'},en:{title:'Who I am is not set by judgments',text:'Praise lifts you, criticism crushes you — then your life is in others\' mouths. Judgment is their task; who you are is your own task.',q:'Ask yourself: setting aside all judgments, what kind of person do I think I am?',tip:'Others\' opinions change; your core doesn\'t have to.'}},
+      {no:'19',zh:{title:'允许自己不够好',text:'可以犯错，可以慢，可以不会，可以「就这样」。允许自己不够好，不是放弃，是把「我必须完美」的执念放下，才有力气往前走。',q:'问自己：如果允许自己「够好就行」，我现在会做什么？',tip:'你是人，不是机器，不必永远满分。'},en:{title:'Allow yourself to be imperfect',text:'It\'s okay to make mistakes, be slow, not know, and just "be." Allowing imperfection isn\'t giving up — it\'s putting down "I must be perfect" so you have energy to move on.',q:'Ask yourself: if "good enough" were allowed, what would I do right now?',tip:'You are human, not a machine; you don\'t need to score 100 forever.'}},
+      {no:'20',zh:{title:'我的感受很重要',text:'委屈就说，累就歇，难过就承认。你的感受，不需要别人的批准才成立。感受是身体的信号灯，忽视它，情绪会越积越满。',q:'问自己：我现在的感受是什么？我准备怎么照顾它？',tip:'照顾自己的感受，不是自私，是自爱。'},en:{title:'My feelings matter',text:'Speak up when hurt, rest when tired, admit when sad. Your feelings don\'t need anyone\'s permission to be real. Feelings are your body\'s signal lights — ignore them and emotions pile up.',q:'Ask yourself: what am I feeling now, and how will I care for it?',tip:'Caring for your own feelings isn\'t selfish — it\'s self-love.'}},
+      {no:'21',zh:{title:'选择即立场',text:'每一次说「好」，都是在对自己说「不」。你的时间、精力、心意都有限，选择什么，就是在告诉世界：什么对我是重要的。',q:'问自己：这个选择，是我想选的，还是别人想让我选的？',tip:'每一个「不」，都是给重要的「是」腾地方。'},en:{title:'Every choice is a stance',text:'Every "yes" you say is a "no" to yourself. Your time, energy, and heart are limited — what you choose tells the world what matters to you.',q:'Ask yourself: is this my choice, or what others want me to choose?',tip:'Every "no" makes room for a "yes" that matters.'}},
+      {no:'22',zh:{title:'可以慢一点',text:'别人在跑，不代表你必须跑；别人 20 岁就如何，不代表你 30 岁就晚了。每个人都有自己的节奏，课题的进度条也在自己手里。',q:'问自己：我是真的想快，还是怕被落下？',tip:'按自己的节奏走，不算掉队。'},en:{title:'It\'s okay to be slower',text:'Others running doesn\'t mean you must run; someone achieving at 20 doesn\'t make 30 too late. Everyone has their own pace — your task\'s progress bar is in your own hands.',q:'Ask yourself: do I truly want to go fast, or am I afraid of being left behind?',tip:'Walking at your own pace isn\'t falling behind.'}},
+      {no:'23',zh:{title:'我的三笔账',text:'常问问自己三笔账：我拥有什么？我缺什么？我想要什么？拥有让你感恩，缺的让你努力，想要的让你知道自己往哪走。',q:'问自己：我最近想要的，是「我想要的」，还是「别人都有的」？',tip:'写下来，比在脑子里想一百遍清楚。'},en:{title:'My three accounts',text:'Ask yourself three accounts often: what do I have? What do I lack? What do I want? What you have brings gratitude, what you lack brings effort, what you want shows your direction.',q:'Ask yourself: what I want lately — is it "what I want" or "what everyone has"?',tip:'Writing it down is clearer than a hundred rounds in your head.'}},
+      {no:'24',zh:{title:'不完美也值得被爱',text:'被爱，不需要先把自己修成「完美版本」。你有小脾气、小缺点、小笨拙，它们不是减分项，是你作为「人」的温度。',q:'问自己：如果是朋友这样，我会嫌弃他吗？',tip:'你给别人的宽容，也请留一份给自己。'},en:{title:'Imperfect people deserve love',text:'Being loved doesn\'t require becoming a "perfect version" first. Your little moods, flaws, and clumsiness aren\'t deductions — they\'re the warmth of being human.',q:'Ask yourself: if a friend were like this, would I mind?',tip:'The grace you give others, save some for yourself.'}}
+    ],
+    practice:{
+      title:{zh:'本周小练习 · 给自己写封信', en:'This week · Write yourself a letter'},
+      text:{zh:'写一封给「三年后的自己」的信：我是谁、我要什么、我想成为什么样的人。写不好没关系，重点是「为自己写」。', en:'Write a letter to "yourself three years from now": who you are, what you want, who you want to become. It doesn\'t need to be good — the point is writing for yourself.'},
+      back:{zh:'写完读一遍，问问自己：这封信里，有多少句是别人的声音？', en:'Read it once and ask: how many lines in this letter are someone else\'s voice?'}
+    }
+  },
+  {
+    id:'relation', color:'#C86B85',
+    name:{zh:'亲密关系', en:'Close Relationships'},
+    note:{zh:'在爱里，也保持各自的课题', en:'Keep your own tasks even in love'},
+    guide:{
+      title:{zh:'越亲近，课题越容易搅在一起', en:'The closer we are, the more tasks tangle'},
+      text:{zh:'我爱你，所以我要替你负责——这句话，是亲密关系里最深的误会。本模块帮你：在爱里，也保持各自的课题。', en:'"I love you, so I must take responsibility for you" — that is the deepest misunderstanding in close relationships. This module helps you keep your own tasks even in love.'},
+      back:{zh:'亲密关系的边界，不是疏远，是「我在这里，但我不替你活」。', en:'A boundary in intimacy is not distance — it\'s "I\'m here, but I won\'t live your life."'}
+    },
+    cards:[
+      {no:'25',zh:{title:'爱不是讨好',text:'爱一个人，不等于事事顺着他。委屈自己换来的「好」，像租来的房子，住得再久，也不是你的。真正的爱，是两个完整的人并肩。',q:'问自己：我是在爱他，还是在怕失去他？',tip:'讨好换不来爱，只能换来暂时的太平。'},en:{title:'Love is not pleasing',text:'Loving someone doesn\'t mean agreeing with everything. "Goodwill" bought by shrinking yourself is like a rented house — stay as long as you like, it\'s still not yours. Real love is two whole people side by side.',q:'Ask yourself: am I loving him, or fearing losing him?',tip:'Pleasing earns no love — only temporary peace.'}},
+      {no:'26',zh:{title:'他的情绪，不全是我的责任',text:'他今天不开心，你不用立刻「负责哄好」；他的焦虑、压力、低气压，是他的课题，不是你的 KPI。陪伴是礼物，哄好是任务，礼物比任务珍贵。',q:'问自己：我可以陪着他，但我不必替他解决所有情绪？',tip:'相爱的人，也要各自消化各自的天气。'},en:{title:'His emotions aren\'t all my job',text:'If he\'s down today, you don\'t have to "fix him" immediately. His anxiety, stress, and low moods are his task, not your KPI. Company is a gift; fixing is a chore — gifts are worth more.',q:'Ask yourself: can I stay with him without solving all his emotions?',tip:'People in love still weather their own skies.'}},
+      {no:'27',zh:{title:'关系里也要有「我的房间」',text:'再亲密的关系，也需要各自的角落：你的爱好、你的朋友、你独处的时间。黏在一起不是亲密，能各自安好，才叫信任。',q:'问自己：我的生活里，有没有一块只属于自己的地方？',tip:'给彼此留白，关系才有呼吸的空间。'},en:{title:'Keep a "room of my own"',text:'Even the closest relationship needs private corners: your hobbies, your friends, your alone time. Clinging isn\'t intimacy — trusting each other to be fine apart is.',q:'Ask yourself: is there a corner of my life that belongs only to me?',tip:'Leave each other space, and the relationship can breathe.'}},
+      {no:'28',zh:{title:'争执时，先分课题',text:'吵架的时候，先别急着争对错。先问一句：这件事，是你的课题还是我的课题？各自的课题各自负责，争论就会变成商量。',q:'问自己：我们吵的，到底是事情，还是「谁说了算」？',tip:'赢了道理，输了感情，这笔账不划算。'},en:{title:'In a quarrel, sort tasks first',text:'When you fight, don\'t rush to decide who\'s right. Ask first: is this your task or mine? When each owns their own task, arguments turn into discussions.',q:'Ask yourself: are we arguing about the issue, or about who\'s in charge?',tip:'Winning the argument but losing the heart — that\'s a bad deal.'}},
+      {no:'29',zh:{title:'说出需求，而不是猜',text:'「他应该知道我在想什么」——这是关系里最大的误会之一。想要什么，说出来；不想要什么，也说出来。猜，是两个人的课题；说，是一个人的行动。',q:'问自己：我有没有把需求说清楚，而不是等对方猜？',tip:'表达需求，不是要求，是邀请。'},en:{title:'Say your needs, don\'t make him guess',text:'"He should know what I\'m thinking" — one of the biggest myths in relationships. Say what you want; say what you don\'t. Guessing takes two; speaking takes one.',q:'Ask yourself: have I stated my needs clearly, or am I waiting to be guessed?',tip:'Expressing a need isn\'t a demand — it\'s an invitation.'}},
+      {no:'30',zh:{title:'亲密≠没有边界',text:'关系越亲密，越需要边界：你的手机是你的，我的日记是我的；你的决定你做主，我的选择我承担。边界不是隔阂，是彼此的尊重。',q:'问自己：我有没有用「因为亲密」，越过他的边界？',tip:'最舒服的关系，是各自有边界又彼此信任。'},en:{title:'Intimacy ≠ no boundaries',text:'The closer the relationship, the more boundaries matter: your phone is yours, my diary is mine; your decisions are yours, my choices are mine to carry. Boundaries aren\'t walls — they\'re respect.',q:'Ask yourself: have I used "because we\'re close" to cross his boundary?',tip:'The most comfortable bond has boundaries and trust together.'}},
+      {no:'31',zh:{title:'分开，也是课题的一部分',text:'如果一段关系让你长期消耗，结束它，是你的课题，也是你的权利。遗憾是正常的，但拖着不结束，把两个人的课题都耽误了。',q:'问自己：我留着这段关系，是因为爱，还是因为习惯？',tip:'告别一段消耗的关系，是勇敢，不是失败。'},en:{title:'Ending is part of the task',text:'If a relationship keeps draining you long-term, ending it is your task and your right. Sadness is normal — but dragging it on delays both people\'s tasks.',q:'Ask yourself: am I staying out of love, or out of habit?',tip:'Leaving a draining relationship is courage, not failure.'}}
+    ],
+    practice:{
+      title:{zh:'本周小练习 · 说出一个需求', en:'This week · State one need'},
+      text:{zh:'挑一件小事，明确告诉对方你的需求：「我希望每周有一个晚上，是我们俩单独聊天的时间。」一次只说一件事，说完就停，不解释太多。', en:'Pick something small and state your need clearly: "I\'d like one evening a week just for us to talk." Say only one thing, then stop — no over-explaining.'},
+      back:{zh:'观察对方的反应，也观察自己的感受：说需求，原来没有那么可怕。', en:'Notice how they respond, and how you feel: saying a need wasn\'t so scary after all.'}
+    }
+  },
+  {
+    id:'worth', color:'#8B7BB8',
+    name:{zh:'自我价值', en:'Self-Worth'},
+    note:{zh:'把价值感，从别人的手里拿回来', en:'Take your sense of worth back from others\' hands'},
+    guide:{
+      title:{zh:'价值感，不需要别人盖章', en:'Self-worth needs no one\'s stamp'},
+      text:{zh:'「我不够好」「我不配」「我比不过别人」——这些声音，往往是别人的课题（成绩、比较、评价）偷走了你的价值感。本模块帮你：把价值感，从别人的手里拿回来。', en:'"I\'m not good enough," "I don\'t deserve it," "I can\'t keep up" — these voices usually mean others\' tasks (grades, comparisons, judgments) have stolen your sense of worth. This module helps you take it back.'},
+      back:{zh:'你的价值，从你出生那一刻就在，不需要任何条件来证明。', en:'Your worth has been there since the moment you were born — it needs no conditions to prove it.'}
+    },
+    cards:[
+      {no:'32',zh:{title:'价值不由成绩决定',text:'考砸了一次，不等于你不行；做错一件事，不等于你这个人错了。成绩、名次、输赢，是某一时刻的结果，不是「你值多少」的判决书。',q:'问自己：如果剥离所有成绩，我的价值还在吗？',tip:'你这个人，比你做的一切事都大。'},en:{title:'Your worth isn\'t set by grades',text:'Failing once doesn\'t mean you\'re not capable; making one mistake doesn\'t make you wrong. Grades, ranks, wins and losses are results of a moment — not a verdict on "how much you\'re worth."',q:'Ask yourself: strip away all achievements — is my worth still there?',tip:'The person you are is bigger than anything you\'ve done.'}},
+      {no:'33',zh:{title:'被拒绝≠我不够好',text:'他没回消息、她没答应、面试没通过——被拒绝，常常只是「不合适」，不是「你不好」。别人有选择的权利，那不是对你价值的裁决。',q:'问自己：被拒绝时，我在心里给自己贴了什么标签？',tip:'别让一次拒绝，定义你整个人。'},en:{title:'Rejection ≠ not good enough',text:'He didn\'t reply, she said no, the interview fell through — rejection is usually just "not a fit," not "you\'re not good." Others have the right to choose; that\'s not a verdict on your worth.',q:'Ask yourself: what label did I put on myself when I was rejected?',tip:'Don\'t let one rejection define all of you.'}},
+      {no:'34',zh:{title:'比较是偷走快乐的小偷',text:'一比较，就痛苦：比成绩、比收入、比孩子……比较没有尽头，因为总有人「更好」。别人的生活是别人的课题，你的日子，是用来过的，不是用来比的。',q:'问自己：我羡慕他的时候，忘了自己的什么？',tip:'拿别人的地图，找不到自己的路。'},en:{title:'Comparison steals your joy',text:'Comparing brings pain: scores, income, kids... there\'s no end, because someone is always "better." Others\' lives are their task; your days are for living, not comparing.',q:'Ask yourself: while envying him, what about myself did I forget?',tip:'You can\'t find your own path on someone else\'s map.'}},
+      {no:'35',zh:{title:'认可自己，从今天开始',text:'等别人夸，不如先看见自己：今天早起、准时、说了句谢谢……都值得在心里点个赞。认可自己，是你的课题，不必等别人盖章。',q:'问自己：今天我做得好的一个小地方是什么？',tip:'睡前夸自己三句，价值感会慢慢长大。'},en:{title:'Approve of yourself, starting today',text:'Instead of waiting for praise, notice yourself first: waking on time, being punctual, saying thank you... all deserve a mental thumbs-up. Approving of yourself is your task — no one else\'s stamp needed.',q:'Ask yourself: what is one small thing I did well today?',tip:'Compliment yourself three times before bed, and self-worth grows.'}},
+      {no:'36',zh:{title:'价值在「我是谁」，不在「我拥有什么」',text:'房子、车子、头衔、孩子的成绩单……这些是「我拥有的」，不是「我是谁」。拥有会变，身份会换，而你是谁——你的善良、坚韧、好奇心，一直都在。',q:'问自己：如果一样都不剩，我还能欣赏自己吗？',tip:'你值得被爱，是因为你这个人，不是你的身外物。'},en:{title:'Worth lies in "who I am," not "what I have"',text:'House, car, titles, your child\'s report card... these are "what I have," not "who I am." Possessions change, roles shift — but who you are: your kindness, resilience, curiosity, is always there.',q:'Ask yourself: if nothing were left, could I still appreciate myself?',tip:'You deserve love for being you — not for your things.'}},
+      {no:'37',zh:{title:'慢，也是一种前进',text:'别人升职了、发财了、晒幸福了，你还站在原地，就开始心慌。可人生不是比赛，是各自赶各自的路。慢一点，不代表你输了。',q:'问自己：我在追赶的，是他人的节奏，还是自己的目标？',tip:'乌龟和兔子，都能到达想去的地方。'},en:{title:'Slow is also progress',text:'Others get promoted, get rich, post their happiness — and you panic, still standing where you are. But life isn\'t a race; it\'s everyone walking their own road. Being slower doesn\'t mean losing.',q:'Ask yourself: am I chasing others\' pace, or my own goals?',tip:'The tortoise and the hare both reach where they\'re going.'}},
+      {no:'38',zh:{title:'你就是你，独一无二',text:'这世上没有第二个人，拥有你的经历、你的眼光、你的故事。你不用成为谁的翻版，「做自己」这件事，没有人能比你做得更好。',q:'问自己：抛开所有「应该」，我真正喜欢自己的地方是？',tip:'你的存在本身，就是不可替代的价值。'},en:{title:'You are you — unique',text:'No one else on earth has your experiences, your eyes, your story. You don\'t need to become anyone\'s copy — when it comes to "being you," nobody can do it better.',q:'Ask yourself: setting aside every "should," what do I genuinely love about myself?',tip:'Your very existence is an irreplaceable value.'}}
+    ],
+    practice:{
+      title:{zh:'本周小练习 · 价值银行', en:'This week · The worth bank'},
+      text:{zh:'准备一个小本子，每天存进一句「今天我值得为自己骄傲的地方」，哪怕只有很小的一句。', en:'Keep a small notebook and deposit one line each day: "something I\'m proud of myself for today" — even if it\'s tiny.'},
+      back:{zh:'一周后翻看，你会发现：你的价值，一直在那里，只是没被自己看见。', en:'Flip through after a week: your worth was there all along — you just hadn\'t seen it.'}
+    }
+  },
+  {
+    id:'family', color:'#7A8B5C',
+    name:{zh:'原生家庭影响', en:'Family Influence'},
+    note:{zh:'看见缠在一起的线，温柔地抽出属于自己的那一根', en:'See the tangled threads, and gently pull out the one that is yours'},
+    guide:{
+      title:{zh:'家，是我们最早学习边界的地方', en:'Home is where we first learn boundaries'},
+      text:{zh:'有些家庭的课题缠得特别紧：父母的期待、兄弟姐妹的比较、家里的老规矩……本模块帮你：看见那些缠在一起的线，温柔地，把属于自己的那一根抽出来。', en:'In some families tasks tangle especially tight: parents\' expectations, siblings\' comparisons, the old house rules... This module helps you see the tangled threads and gently pull out the one that is yours.'},
+      back:{zh:'你不是在「怪父母」，你是在练习：带着爱，长成自己的样子。', en:'You\'re not "blaming your parents" — you\'re practicing growing into yourself, with love.'}
+    },
+    cards:[
+      {no:'39',zh:{title:'父母的期待，是你的课题吗',text:'爸妈想让你考公、结婚、生娃、留在老家……他们的期待，是他们的课题；你的人生怎么过，是你的课题。爱他们，和听他们的，是两件事。',q:'问自己：这件事，是我想做的，还是爸妈想让我做的？',tip:'满足期待是孝顺，守住人生是成长。'},en:{title:'Are parents\' expectations your task?',text:'They want you to take the civil exam, marry, have kids, stay in the hometown... Their expectations are their task; how you live your life is yours. Loving them and obeying them are two different things.',q:'Ask yourself: is this something I want, or something they want for me?',tip:'Meeting expectations is filial; keeping your life is growth.'}},
+      {no:'40',zh:{title:'不必为父母的人生负责',text:'爸妈吵架、心情不好、过得不顺心——那是他们人生的课题，不是你的错。小时候你可能无力改变，现在也不必去「拯救」。你已经长大，他们的路，该他们自己走。',q:'问自己：我在为父母的事自责吗？那真的是我的事吗？',tip:'你改变不了他们，但你可以活好自己。'},en:{title:'You don\'t own your parents\' lives',text:'Mom and Dad argue, feel low, have a rough patch — that\'s their life\'s task, not your fault. As a child you couldn\'t change it; as an adult you don\'t need to "save" them. You\'ve grown up; their road is theirs to walk.',q:'Ask yourself: am I blaming myself for my parents\' matters? Is that really mine?',tip:'You can\'t change them, but you can live yourself well.'}},
+      {no:'41',zh:{title:'感恩与顺从是两回事',text:'感恩，是记得父母的好，发自内心地说谢谢；顺从，是「他说什么我都照做」，不管自己愿不愿意。感恩是你的课题，顺从不是必须的。',q:'问自己：我可以感恩父母，同时不同意他们吗？',tip:'真正的成熟，是既感恩，又有自己的主见。'},en:{title:'Gratitude and obedience are different',text:'Gratitude is remembering their kindness and thanking them from the heart; obedience is "doing whatever they say," whether you want to or not. Gratitude is your task; obedience is not required.',q:'Ask yourself: can I be grateful to my parents and still disagree with them?',tip:'True maturity is gratitude with a mind of your own.'}},
+      {no:'42',zh:{title:'我可以有自己的选择',text:'家里的老规矩、老观念，是上一代的课题。时代变了，你可以有不同的活法：不同的工作、不同的生活方式、不同的想法。选择自己的路，不丢人。',q:'问自己：如果不怕父母失望，我会怎么选？',tip:'你的人生，你有最终解释权。'},en:{title:'I can make my own choices',text:'The old rules and old beliefs at home belong to the previous generation. Times change — you can live differently: different work, different ways, different ideas. Choosing your own path is nothing to be ashamed of.',q:'Ask yourself: if I weren\'t afraid of disappointing them, what would I choose?',tip:'Your life: you hold the final word.'}},
+      {no:'43',zh:{title:'和过去握手',text:'小时候受过的伤，不用假装没发生过，也不用让它一直定义现在的你。看见它、承认它，然后往前走——过去是过去的事，今天是你的课题。',q:'问自己：我还在用多少年前的方式，应对今天的事？',tip:'你可以带着过去的伤，去过新的生活。'},en:{title:'Make peace with the past',text:'The hurts of childhood don\'t need to be pretended away, nor do they need to define you forever. See them, own them, then walk on — the past is past; today is your task.',q:'Ask yourself: am I still handling today\'s problems with a years-old style?',tip:'You can carry old scars into a new life.'}},
+      {no:'44',zh:{title:'父母也是普通人',text:'父母也会累、会错、会无能为力。他们给你的，已经是他们当时能给的全部。看清这一点，不是原谅谁，是让自己从「等待完美的父母」里解放出来。',q:'问自己：我是不是还在等一句「对不起」，或一句「我为你骄傲」？',tip:'等不到也没关系，你可以先对自己说。'},en:{title:'Parents are ordinary people too',text:'Parents get tired, make mistakes, and run out of strength. What they gave you was everything they could give at the time. Seeing this isn\'t about forgiving anyone — it\'s freeing yourself from "waiting for perfect parents."',q:'Ask yourself: am I still waiting for an "I\'m sorry" or an "I\'m proud of you"?',tip:'If it never comes, that\'s okay — you can say it to yourself first.'}},
+      {no:'45',zh:{title:'用我的方式爱他们',text:'爱父母，不只有「听话」这一种方式。可以是每周一通电话、一份礼物、一次陪伴，也可以是：把自己照顾好，让他们放心。爱的形式，由你定义。',q:'问自己：用什么方式爱他们，既舒服又是我能承担的？',tip:'先安顿好自己，你给的爱才有力量。'},en:{title:'Love them my way',text:'Loving your parents isn\'t only "being obedient." It can be a weekly call, a gift, time together — or simply taking good care of yourself so they can rest easy. The form of love is yours to define.',q:'Ask yourself: how can I love them in a way that\'s comfortable and sustainable for me?',tip:'Settle yourself first; only then does your love have strength.'}}
+    ],
+    practice:{
+      title:{zh:'本周小练习 · 家庭课题清单', en:'This week · Family task list'},
+      text:{zh:'写下三件「爸妈常替我操心/做主」的事，然后一件件问：这件事，现在该由谁负责？', en:'Write down three things your parents often worry about or decide for you, then ask one by one: who should own this now?'},
+      back:{zh:'挑其中一件，本周试着自己做决定，并温和地告诉他们你的想法。', en:'Pick one: this week, decide it yourself, and gently tell them what you think.'}
+    }
+  },
+  {
+    id:'inspiration', color:'#BA68C8',
+    name:{zh:'灵感卡牌', en:'Inspiration Cards'},
+    note:{zh:'无功能牌 · 21 张中英双语肯定句，抽到后获得一句正向能量，点亮心情', en:'No mechanics · 21 bilingual affirmations — draw one and receive a word of positive energy'},
+    guide:{
+      title:{zh:'当你需要一点光', en:'When you need a little light'},
+      text:{zh:'灵感卡牌不参与课题分离的问答机制。它们只负责在你低落、卡住、需要勇气的时候，递上一句肯定的话。抽到后不用分析，读三遍，让这句话陪你一会儿。', en:'Inspiration Cards take no part in the task-separation Q&A. They exist only to hand you an affirming sentence when you feel low, stuck, or short on courage. No analysis needed — read it three times and let it keep you company.'},
+      back:{zh:'用法：随机抽 / 早晨抽 / 送给朋友。不记分、不争输赢、只负责温柔。', en:'How to use: draw at random / draw in the morning / gift to a friend. No scoring, no winners — only gentleness.'}
+    },
+    cards:[] // 由下面的特殊渲染处理
+  }
+];
+
+/* ==================== 国际化 ==================== */
+const I18N = { zh:{}, en:{} };
+function addI18n(part){ for(const k in part){ I18N.zh[k] = part[k].zh; I18N.en[k] = part[k].en; } }
+addI18n({
+  nav_brand:{zh:'百灵卡 Bailey\'s Cards · 心理成长系列', en:'Bailey\'s Cards · Growth Series'},
+  nav_sources:{zh:'灵感来源', en:'Sources'},
+  nav_overview:{zh:'项目概览', en:'Overview'},
+  nav_box:{zh:'包装盒', en:'Packaging'},
+  nav_cards:{zh:'全部卡牌', en:'All Cards'},
+  nav_rules:{zh:'玩法规则', en:'How to Play'},
+  nav_game:{zh:'Bailey\'s Island →', en:'Bailey\'s Island →'},
+  nav_features:{zh:'核心亮点', en:'Highlights'},
+  hero_kicker:{zh:'阿德勒心理学 × 彩虹卡 · 心理成长练习工具', en:'Adlerian Psychology × Rainbow Cards · Growth Practice Tool'},
+  hero_title:{zh:'课题分离练习卡牌<br><span class="en">SEPARATION OF TASKS CARDS</span>', en:'Task Separation Practice Cards<br><span class="en">课题分离 · 练习卡牌</span>'},
+  hero_sub:{zh:'把别人的课题，还给别人<br>把自己的课题，握在自己手里', en:'Return others\' tasks to them.<br>Keep your own in your own hands.'},
+  hero_desc:{zh:'来自阿德勒心理学与彩虹卡的双重灵感：这是一副不考你、不说教的心理练习卡。用一句话、一个问句，帮 9 岁到 99 岁的人分清「这是谁的课题」——少一点内耗，多一点边界。另附 21 张灵感卡牌，随时抽一张，点亮心情。「百聆」即静心聆听——愿你在牌中听见自己的声音。', en:'Inspired by both Adlerian Psychology and Rainbow Cards, this is a practice deck that never quizzes or preaches. With one sentence and one question, it helps people from 9 to 99 sort out "whose task is this" — less inner friction, more healthy boundaries. It also includes 21 Inspiration Cards: draw one anytime to brighten your mood. "Bǎilíng" means listening with a quiet heart — may you hear your own voice through these cards.'},
+  hero_cta1:{zh:'随机抽一张试试', en:'Draw a card now'},
+  hero_cta2:{zh:'从今天的心情开始', en:'Start from your mood'},
+  fc1:{zh:'情绪乱的时候<br>翻一翻', en:'When feelings are messy,<br>flip through'},
+  fc2:{zh:'关系乱的时候<br>抽一张', en:'When relationships tangle,<br>draw a card'},
+  fc3:{zh:'每天 3 分钟<br>练习温柔的边界', en:'3 minutes a day,<br>gentle boundaries'},
+  fc5:{zh:'灵感卡牌<br>点亮今天', en:'Inspiration Cards<br>brighten today'},
+  fc4_logo:{zh:'岛', en:'B'},
+  fc4_title:{zh:'课题分离<br>练习卡牌', en:'Task Separation<br>Practice Cards'},
+  fc4_brand:{zh:'百灵卡 Bailey\'s Cards', en:'Bailey\'s Cards'},
+  fc4_series:{zh:'心理成长系列', en:'Growth Series'}
+});
+addI18n({
+  src_h2:{zh:'双灵感来源', en:'Two Sources of Inspiration'},
+  src_p:{zh:'一副卡牌，两个源头：以阿德勒心理学为「骨」，以彩虹卡为「光」。两者篇幅相当、互相呼应，共同决定了这套卡牌的气质与内容。', en:'One deck, two roots: Adlerian Psychology as the skeleton, Rainbow Cards as the light. Given equal space, together they shaped the spirit and content of this deck.'},
+  src_a_badge:{zh:'理论基石 · 阿德勒心理学', en:'Theoretical Root · Adlerian Psychology'},
+  src_a_title:{zh:'课题分离，来自阿德勒', en:'Task Separation, from Adler'},
+  src_a_sub:{zh:'个体心理学 · Alfred Adler', en:'Individual Psychology · Alfred Adler'},
+  src_a_p1:{zh:'阿德勒（Alfred Adler）创立了个体心理学：人是不可分割的整体，思想、情感与行动彼此相连。他相信自卑感人人都有、并不可怕——它是成长的起点；人凭借「追求超越」的动力向前，不是要压过别人，而是成为更完整的自己。', en:'Alfred Adler founded Individual Psychology: a person is an indivisible whole, with thoughts, feelings, and actions all connected. He believed the feeling of inferiority is universal — not something to fear, but the starting point of growth. People move forward through the drive to overcome — not to outdo others, but to become a fuller self.'},
+  src_a_chip1:{zh:'个体心理学', en:'Individual Psychology'},
+  src_a_chip2:{zh:'自卑与超越', en:'Inferiority & Striving'},
+  src_a_chip3:{zh:'社会兴趣', en:'Social Interest'},
+  src_a_chip4:{zh:'目的论', en:'Teleology'},
+  src_a_chip5:{zh:'课题分离', en:'Task Separation'},
+  src_a_p2:{zh:'「社会兴趣」提醒我们：真正的心理健康，在于与他人和社会的联结与贡献；「目的论」则说：我们不是被过去推着走，而是被今天自己选择的目标牵引。而「课题分离」，是这个体系里最锋利也最温柔的一把尺子——分清「这是谁的课题」，不替别人扛，也不让别人替我们活。', en:'"Social interest" reminds us that true mental health lies in connecting with and contributing to others and society. "Teleology" says we are not pushed by the past, but pulled by goals we choose today. And "task separation" is the sharpest yet gentlest ruler in this system — sorting out "whose task this is," not carrying others\' burdens, and not letting others live our lives for us.'},
+  src_insight_title:{zh:'对创作的启发', en:'Inspiration for this deck'},
+  src_a_insight:{zh:'每一张课题卡的问句，都围绕「谁的课题」展开：结果由谁承担、我能控制什么、管下去我会不会累。卡牌把抽象理论，变成 9 岁到 99 岁都能用的一句话练习。', en:'Every question on the practice cards revolves around "whose task": who bears the outcome, what I can control, and whether I\'ll wear myself out by holding on. The deck turns abstract theory into one-sentence practices that work for ages 9 to 99.'},
+  src_r_badge:{zh:'情绪灵感 · 彩虹卡', en:'Emotional Inspiration · Rainbow Cards'},
+  src_r_title:{zh:'正向能量，来自彩虹卡', en:'Positive Energy, from Rainbow Cards'},
+  src_r_sub:{zh:'Rainbow Cards · Doris Wenzel', en:'Rainbow Cards · Doris Wenzel'},
+  src_r_p1:{zh:'彩虹卡由德国艺术治疗师多丽丝·文策尔（Doris Wenzel）研发，由 245 张带有积极信念的卡片组成，涵盖红、橙、黄、绿、蓝、靛、紫七种颜色。每张卡片都写着一句智慧而肯定的话语，涉及情感、事业、自我认知、人际关系等层面。', en:'Rainbow Cards were developed by German art therapist Doris Wenzel: 245 cards carrying positive beliefs, spanning seven colors — red, orange, yellow, green, blue, indigo, and violet. Each card holds a wise, affirming sentence touching on emotion, career, self-awareness, relationships, and more.'},
+  src_r_chip1:{zh:'吸引力法则', en:'Law of Attraction'},
+  src_r_chip2:{zh:'积极心理学', en:'Positive Psychology'},
+  src_r_chip3:{zh:'七种颜色', en:'Seven Colors'},
+  src_r_chip4:{zh:'245 张', en:'245 Cards'},
+  src_r_p2:{zh:'它的理论基础是吸引力法则与积极心理学：吸引力法则认为，积极的思想会吸引积极的经历——彩虹卡便用正面的语句帮使用者调整心态；积极心理学则研究人类积极品质与力量——卡片话语引导人们关注自身的优点与生活的美好。', en:'Its foundations are the Law of Attraction and Positive Psychology: the Law of Attraction holds that positive thoughts attract positive experiences, so the cards use affirmative language to help users shift their mindset; Positive Psychology studies human strengths and flourishing, and the card messages guide people to notice their own strengths and the beauty in life.'},
+  src_insight_title2:{zh:'对创作的启发', en:'Inspiration for this deck'},
+  src_r_insight:{zh:'21 张灵感卡牌借鉴彩虹卡的形式：随机抽一张，读三遍，让一句肯定的话陪自己一会儿。它们不参与问答机制，只负责在你低落时，递上一束光。', en:'The 21 Inspiration Cards borrow the Rainbow Cards form: draw one at random, read it three times, and let an affirmation keep you company. They take no part in the question mechanics — their only job is to hand you a beam of light when you feel low.'}
+});
+addI18n({
+  ov_h2:{zh:'项目概览', en:'Project Overview'},
+  ov_p:{zh:'以阿德勒心理学「课题分离」为骨、以彩虹卡「正向肯定」为光，面向小学生到老年人的全龄段心理成长练习工具，87 张卡牌全部完成。', en:'Skeleton of Adlerian "task separation," light of Rainbow Cards\' affirmations — an all-age psychological growth practice tool from elementary schoolers to seniors. All 87 cards are complete.'},
+  ov_s1:{zh:'张实体卡牌', en:'physical cards'},
+  ov_s2:{zh:'大指引场景', en:'guide scenarios'},
+  ov_s3:{zh:'套玩法体系', en:'play systems'},
+  ov_s4:{zh:'适用年龄（无上限）', en:'Ages 9+ (no upper limit)'},
+  pr1_title:{zh:'人人能懂', en:'Plain for everyone'},
+  pr1_text:{zh:'全部文案用「天气、圈圈、窗户」等日常比喻替代心理学术语，三年级小学生也能读懂。', en:'Everyday metaphors — weather, circles, windows — replace psychological jargon, so a third-grader can read it.'},
+  pr2_title:{zh:'句句好读', en:'Gentle wording'},
+  pr2_text:{zh:'把「你应该」全部写成「你可以」；不说教、不给标准答案，只用问句引导自我觉察。', en:'"You should" becomes "you can"; no preaching, no right answers — only questions that invite self-awareness.'},
+  pr3_title:{zh:'情绪补光', en:'Mood lighting'},
+  pr3_text:{zh:'灵感卡牌不参与问答机制，只在你低落时递上一句肯定的话，像给心情开一盏小灯。', en:'Inspiration Cards sit outside the Q&A mechanics, offering one affirming sentence when you\'re low — a small lamp for your mood.'},
+  box_h2:{zh:'包装盒设计', en:'Packaging Design'},
+  box_p:{zh:'盒面 / 盒背 / 盒侧三面完整设计，从品牌故事到内容清单，一目了然。', en:'A complete three-face design — front, back, side — from brand story to contents, at a glance.'},
+  box_f_top:{zh:'百灵卡 Bailey\'s Cards · 心理成长系列', en:'Bailey\'s Cards · Growth Series'},
+  box_f_h3:{zh:'课题分离练习卡牌', en:'Task Separation Practice Cards'},
+  box_f_p:{zh:'把别人的课题，还给别人<br>把自己的课题，握在自己手里', en:'Return others\' tasks to them.<br>Keep your own in your hands.'},
+  box_b_top:{zh:'产品简介', en:'About the Product'},
+  box_b_p:{zh:'这是一副以阿德勒心理学为骨、以彩虹卡为光的练习卡牌。它用一句话、一个问句，帮你分清「这是谁的课题」——别人的情绪、选择、评价，不必都背在自己身上。情绪乱时翻一翻，关系乱时抽一张，每天 3 分钟，练习温柔而清晰的边界。另含 21 张灵感卡牌，低落时随手抽一张，获得一句正向能量。', en:'A practice deck with Adlerian Psychology as its skeleton and Rainbow Cards as its light. With one sentence and one question, it helps you sort out "whose task is this" — others\' emotions, choices, and judgments don\'t all have to ride on your back. Flip through it when feelings are messy; draw a card when relationships tangle: 3 minutes a day practicing gentle, clear boundaries. It also includes 21 Inspiration Cards — draw one when you\'re low and receive a word of positive energy.'},
+  box_b_list1:{zh:'八大指引场景：', en:'Eight guide scenarios:'},
+  box_b_list1v:{zh:'关于 · 心理困境 · 边界判断 · 自我认知 · 亲密关系 · 自我价值 · 原生家庭影响 · 灵感卡牌', en:'The Basics · Emotional Struggles · Boundary Check · Self-Awareness · Close Relationships · Self-Worth · Family Influence · Inspiration Cards'},
+  box_b_list2:{zh:'适用人群：', en:'For whom:'},
+  box_b_list2v:{zh:'想少一点内耗的你 ｜ 9 岁以上所有人 ｜ 一个人、两个人、一家人都能玩', en:'For you who want less inner friction | Everyone aged 9+ | Solo, in pairs, or as a family'},
+  box_s_top:{zh:'— 百灵卡 Bailey\'s Cards —', en:'— Bailey\'s Cards —'},
+  box_s_p1:{zh:'别人的课题，不必由你背负。', en:'Others\' tasks need not be carried by you.'},
+  box_s_p2:{zh:'愿你在混乱时找到方向，在关系里拥有边界。', en:'May you find direction in chaos and boundaries in relationships.'},
+  box_s_list:{zh:'盒内包含：', en:'Inside the box:'},
+  box_s_listv:{zh:'规则卡 ×3 ｜ 快速参考卡 ×1 ｜ 场景指引卡 ×8 ｜ 课题练习卡 ×45 ｜ 模块练习卡 ×7 ｜ 灵感卡牌 ×21 ｜ 空白卡 ×2', en:'Rule Cards ×3 | Quick Reference ×1 | Guide Cards ×8 | Task Practice Cards ×45 | Module Practice ×7 | Inspiration Cards ×21 | Blank Cards ×2'}
+});
+addI18n({
+  cards_h2:{zh:'全部卡牌 · 按模块浏览', en:'All Cards · Browse by Module'},
+  cards_p:{zh:'点击任意卡牌可翻转：<b>课题卡</b>正面＝卡名＋解释，背面＝问句＋提醒；<b>灵感卡</b>正面＝中英肯定句，背面＝使用提示。', en:'Click any card to flip: <b>practice cards</b> show name + explanation on the front, question + tip on the back; <b>Inspiration Cards</b> show a bilingual affirmation on the front and usage tips on the back.'},
+  rules_h2:{zh:'玩法规则', en:'How to Play'},
+  rules_p:{zh:'三种独处玩法 + 三种家庭玩法 + 灵感卡牌玩法，一个人可以练，一家人也能玩。', en:'Three solo modes + three family modes + Inspiration play — practice alone, or play together as a family.'},
+  rule1_t:{zh:'这是一副什么样的牌', en:'What kind of deck is this'},
+  rule1_b:{zh:'这不是游戏卡，是你的「心理练习卡」。它不考你、不说教、不给标准答案，只在你情绪乱的时候，帮你停下来想一想：<b>此刻这件事，到底是谁的课题？</b><br><br>卡片上的字，不用背、不用记。翻开时慢一点读，读到哪一句让你心里一动，就停在那张卡上，多待一会儿。', en:'This is not a game deck — it\'s a "psychological practice deck." It never quizzes, preaches, or hands out right answers. When your feelings are messy, it simply helps you pause and ask: <b>whose task is this, right now?</b><br><br>No need to memorize a thing. Flip slowly; when a line touches something inside you, stop on that card and stay with it a while.'},
+  rule2_t:{zh:'三种独处玩法', en:'Three solo modes'},
+  rule2_b:{zh:'<b>玩法一 · 情绪急救</b>：心里堵、气不顺时，找到最像你处境的卡，问三句话——①这是谁的课题？②我能控制什么？③我能为自己做的一小步是什么？<br><br><b>玩法二 · 觉察练习</b>：每天睡前抽 1 张，想一想今天有没有类似的事，连续 7 天，认出自己的老模式。<br><br><b>玩法三 · 日常抽牌</b>：早晨随机抽 1 张作为今天的「课题提醒」，或挑一张放在床头、手机壳里陪自己。', en:'<b>Mode 1 · Emotional first aid</b>: when you feel stuck or upset, find the card closest to your situation and ask three questions — ① Whose task is this? ② What can I control? ③ What is one small step I can take for myself?<br><br><b>Mode 2 · Awareness practice</b>: draw 1 card before bed and recall whether anything similar happened today; do this for 7 days to recognize your old patterns.<br><br><b>Mode 3 · Daily draw</b>: draw 1 card in the morning as today\'s "task reminder," or keep one by your bed or in your phone case as company.'},
+  rule3_t:{zh:'大家一起玩（家庭版）', en:'Play together (family edition)'},
+  rule3_b:{zh:'<b>玩法 A · 故事接龙</b>（2~6 人）：轮流抽卡讲一件自己的小事，下一个人问：「如果是你，会怎么分这个课题？」不许打断，不许评判。<br><br><b>玩法 B · 课题小法庭</b>：一人抽卡念出场景，其他人举手投票「这是谁的课题」，听听彼此的理由。<br><br><b>玩法 C · 今天夸自己</b>：每人抽一张卡，说出自己今天「做得好的一个小地方」，其他人补充夸。', en:'<b>Mode A · Story relay</b> (2–6 players): take turns drawing a card and sharing a small story; the next person asks, "If it were you, how would you separate this task?" No interrupting, no judging.<br><br><b>Mode B · Task tribunal</b>: one player draws and reads a scenario; everyone votes on "whose task is this" and explains their reasons.<br><br><b>Mode C · Compliment yourself today</b>: each player draws a card and names one small thing they did well today; others add their compliments.'},
+  rule4_t:{zh:'灵感卡牌玩法（无机制）', en:'Inspiration Cards (no mechanics)'},
+  rule4_b:{zh:'<b>玩法 D · 点亮心情</b>：情绪低落、卡住、没有能量时，从灵感卡牌里随机抽 1 张，读三遍这句话，感受它进入身体。<br><br><b>玩法 E · 当天的能量句</b>：早晨刚醒或需要勇气时抽一张，把它作为今天的「主题句」，可以写在手机备忘录里或放在桌面上。<br><br><b>玩法 F · 送给身边的人</b>：看到朋友低落时，替他抽一张灵感卡递过去，说一句：「这张卡想送给你。」', en:'<b>Mode D · Brighten your mood</b>: when you feel low, stuck, or drained, draw 1 Inspiration Card at random and read it three times, letting it sink in.<br><br><b>Mode E · Energy sentence of the day</b>: draw one when you wake up or need courage, and make it today\'s "theme sentence" — jot it in your phone or put it on your desk.<br><br><b>Mode F · Gift it to someone</b>: when a friend is down, draw an Inspiration Card for them and hand it over with the words: "This card wanted to find you."'},
+  insp_h4:{zh:'🌈 灵感卡牌说明', en:'🌈 About the Inspiration Cards'},
+  insp_p:{zh:'灵感卡牌是这副牌的「情绪补光」：它们不参与课题分离的问答机制，不比较对错，只负责在你需要的时候递上一句肯定。抽到后不必分析，只需读、感受、让这句话陪你一会儿。', en:'Inspiration Cards are this deck\'s "mood lighting": they sit outside the task-separation Q&A, compare no right or wrong, and exist only to offer an affirmation when you need one. No analysis required — just read, feel, and let the sentence keep you company.'},
+  quick_h4:{zh:'🃏 快速参考卡 · 课题分离三问', en:'🃏 Quick Reference · Three Questions of Task Separation'},
+  quick_q1:{zh:'这件事的结果，最终由谁承担？', en:'Who ultimately bears the outcome of this?'},
+  quick_q2:{zh:'这件事，我能控制的部分是什么？', en:'What part of this can I control?'},
+  quick_q3:{zh:'如果我一直管，我自己会累吗？', en:'If I keep holding on, will I wear myself out?'},
+  quick_tag:{zh:'谁的课题，谁做主；谁能控制，谁负责。', en:'Whose task it is, decides; who can control it, owns it.'},
+  qc_b1:{zh:'一句话记住它：', en:'Remember it in one line:'},
+  qc_b1v:{zh:'别人的情绪、选择、评价 → <b>还回去</b><br>自己的感受、行动、责任 → <b>接过来</b>', en:'Others\' emotions, choices, judgments → <b>hand them back</b><br>Your own feelings, actions, responsibilities → <b>take them on</b>'},
+  qc_b2:{zh:'小提醒：', en:'A gentle note:'},
+  qc_b2v:{zh:'分课题不是不管别人，而是「我关心你，但不替你活」。', en:'Separating tasks isn\'t ignoring others — it\'s "I care about you, but I won\'t live your life for you."'},
+  notice:{zh:'<b>使用须知：</b>① 不评判、不纠正——说「我听到你了」，而不是「你这样不对」。② 没有标准答案——卡牌是镜子，不是裁判。③ 孩子参与时，由孩子先讲，大人先听。④ 情绪太大时先暂停——拥抱比讲道理更有用。⑤ 本卡牌是成长工具，<b>不能替代专业心理咨询</b>；若长期困扰，请寻求专业帮助。', en:'<b>Notes for use:</b> ① Don\'t judge or correct — say "I hear you," not "you\'re wrong." ② There are no right answers — the cards are a mirror, not a referee. ③ When children join, let them speak first; adults listen first. ④ Pause when emotions run high — a hug beats a lecture. ⑤ This deck is a growth tool and <b>cannot replace professional counseling</b>; if troubles persist, please seek professional help.'}
+});
+addI18n({
+  feat_h2:{zh:'核心亮点 · 一眼看懂这套牌', en:'Key Highlights · See It at a Glance'},
+  feat_p:{zh:'六个维度说明这套卡牌为什么值得一看——无论你是来玩，还是来评审。', en:'Six dimensions show why this deck is worth your attention — whether you come to play or to review.'},
+  feat1_t:{zh:'87 张完整体系', en:'A complete 87-card system'},
+  feat1_b:{zh:'45 张课题练习卡 + 21 张灵感卡，加上场景指引、规则与快速参考卡，构成从入门到深化的完整练习路径。', en:'45 task practice cards + 21 Inspiration Cards, plus guide, rule, and quick-reference cards, form a complete path from first steps to deep practice.'},
+  feat2_t:{zh:'三问即上手', en:'Three questions to start'},
+  feat2_b:{zh:'结果由谁承担？我能控制什么？管下去会累吗？一张快速参考卡，让任何人在一分钟内掌握课题分离的核心。', en:'Who bears the outcome? What can I control? Will I wear myself out? One quick-reference card puts the core of task separation in anyone\'s hands within a minute.'},
+  feat3_t:{zh:'理论有出处', en:'Every card traces to theory'},
+  feat3_b:{zh:'以阿德勒个体心理学为骨、彩虹卡正向肯定为光，每一张卡都能回溯到具体理论概念，可查证、可讨论。', en:'Built on Adlerian Individual Psychology as its skeleton and Rainbow Card affirmations as its light, every card traces to a concrete concept — verifiable and discussable.'},
+  feat4_t:{zh:'全龄段适配', en:'Adapts to every age'},
+  feat4_b:{zh:'9 岁到 99 岁都能用：孩子读得懂、老人看得清；一个人练、一家人玩、课堂上用，都有对应玩法。', en:'Works from age 9 to 99: children can read it, seniors can see it clearly; solo practice, family play, and classroom use each have their own modes.'},
+  feat5_t:{zh:'中英双语', en:'Bilingual, both complete'},
+  feat5_b:{zh:'全部卡牌与规则均为中英双语，适合国际交流、英语课堂与跨文化分享，右上角一键切换。', en:'Every card and rule is fully bilingual — ready for international exchange, English classes, and cross-cultural sharing. Switch anytime at the top right.'},
+  feat6_t:{zh:'交互式数字演示', en:'Interactive digital demo'},
+  feat6_b:{zh:'本页即产品本身：点击翻转卡片、随机抽一张、随时切换语言，无需安装即可完整体验。', en:'This page is the product itself: flip cards with a click, draw one at random, switch languages anytime — the full experience, no installation needed.'},
+  scn_h3:{zh:'适用场景 · 谁在用这套牌', en:'Who It\'s For · Where It Works'},
+  scn1_t:{zh:'一个人 · 自我觉察', en:'Solo · self-awareness'},
+  scn1_b:{zh:'每天睡前 3 分钟，抽一张卡，问自己一个问题。', en:'Three minutes before bed: draw a card, ask yourself one question.'},
+  scn2_t:{zh:'两个人 · 关系沟通', en:'Pairs · communication'},
+  scn2_b:{zh:'情侣、亲子、朋友之间，用卡牌打开平时不敢说的话。', en:'Between partners, parents and kids, or friends — let the cards open conversations you rarely dare to start.'},
+  scn3_t:{zh:'一家人 · 睡前共读', en:'Family · evening reading'},
+  scn3_b:{zh:'晚饭后围坐一圈，轮流抽卡，听听彼此的故事。', en:'Sit in a circle after dinner, take turns drawing, and hear each other\'s stories.'},
+  scn4_t:{zh:'课堂与团体 · 心理教育', en:'Classrooms & groups · psychoeducation'},
+  scn4_b:{zh:'心理课、班会、社团活动，用卡牌练习边界、沟通与自我价值。', en:'In psychology classes, homerooms, and clubs, use the cards to practice boundaries, communication, and self-worth.'},
+  hb1:{zh:'中英双语', en:'Chinese & English'},
+  hb2:{zh:'9–99 岁全龄适用', en:'Ages 9–99'},
+  hb3:{zh:'即开即用 · 无需安装', en:'Opens instantly · no install'},
+  footer:{zh:'<b>课题分离练习卡牌</b> · 数字演示版 v4.0<br>百灵卡 Bailey\'s Cards · 心理成长系列 ｜ 阿德勒心理学 × 彩虹卡 ｜ 87 张卡牌 · 中英双语', en:'<b>Task Separation Practice Cards</b> · Digital Demo v4.0<br>Bailey\'s Cards · Growth Series | Adlerian Psychology × Rainbow Cards | 87 cards · bilingual'},
+  draw_p:{zh:'抽一张 · 陪自己一会儿', en:'Draw one · keep yourself company'},
+  draw_hint_open:{zh:'点卡片翻开 →', en:'Tap the card to flip →'},
+  draw_hint_close:{zh:'← 点卡片盖回去', en:'← Tap to flip it back'},
+  cards_guide_badge:{zh:'场景指引', en:'Guide Card'},
+  cards_guide_back:{zh:'背面：', en:'Back:'},
+  cards_tno:{zh:'课题卡', en:'Card'},
+  cards_flip:{zh:'点击翻面 → 问问自己', en:'Tap to flip → ask yourself'},
+  cards_hint:{zh:'点一下翻回正面', en:'Tap to flip back'},
+  cards_practice:{zh:'模块练习', en:'Module Practice'},
+  cards_insp_badge:{zh:'🌈 灵感卡牌', en:'🌈 Inspiration Cards'},
+  cards_insp_no:{zh:'灵感卡', en:'Inspiration'},
+  cards_insp_tip:{zh:'让这句话，陪你今天。', en:'Let these words keep you company today.'},
+  draw_insp_no:{zh:'灵感卡', en:'Inspiration'},
+  draw_task:{zh:'课题卡', en:'Card'}
+});
+addI18n({
+  gate_q:{zh:'今天，是什么让你心里不舒服？', en:'What is it, today, that makes your heart uneasy?'},
+  gate_sub:{zh:'不用想清楚，先挑一个最像此刻的你。点一下，我们陪你去对应的卡牌。', en:'No need to name it precisely — just pick the one closest to how you feel right now. Tap it, and we\'ll take you to the matching cards.'},
+  g_distress:{zh:'心里堵、情绪乱', en:'Stuck or messy feelings'},
+  g_distress_e:{zh:'→ 心理困境', en:'→ Struggles'},
+  g_boundary:{zh:'被某人惹烦', en:'Annoyed by someone'},
+  g_boundary_e:{zh:'→ 边界判断', en:'→ Boundaries'},
+  g_relation:{zh:'关系里很累', en:'Tired in relationships'},
+  g_relation_e:{zh:'→ 亲密关系', en:'→ Close ties'},
+  g_worth:{zh:'觉得自己不够好', en:'Feel not good enough'},
+  g_worth_e:{zh:'→ 自我价值', en:'→ Self-worth'},
+  g_self:{zh:'不知道要什么', en:'Don\'t know what I want'},
+  g_self_e:{zh:'→ 自我认知', en:'→ Self-awareness'},
+  g_family:{zh:'和家人相处累', en:'Tired with family'},
+  g_family_e:{zh:'→ 原生家庭', en:'→ Family'},
+  g_insp:{zh:'只想被鼓励', en:'Just need a boost'},
+  g_insp_e:{zh:'→ 灵感卡', en:'→ Inspiration'},
+  g_about:{zh:'想先了解', en:'Want to learn first'},
+  g_about_e:{zh:'→ 入门', en:'→ Basics'},
+  gate_or:{zh:'或者，<a href="#cards">慢慢逛全部卡牌 →</a>', en:'Or, <a href="#cards">browse all the cards slowly →</a>'},
+  intro_q:{zh:'今天，是什么让你心里不舒服？', en:'What is sitting heavy on you today?'},
+  intro_sub:{zh:'不用想清楚，先挑一个最像此刻的你。点一下，我们陪你去对应的卡牌。', en:'No need to name it precisely — just pick the one that feels most like you right now. We\'ll walk you to the matching cards.'},
+  intro_or:{zh:'或者，<a href="#cards" onclick="closeIntro()">慢慢逛全部卡牌 →</a>', en:'Or, <a href="#cards" onclick="closeIntro()">browse all the cards slowly →</a>'},
+  intro_bailey:{zh:'这套牌，也是 Bailey\'s Island 的一页。', en:'This deck is also a page of Bailey\'s Island.'},
+  ugc_count:{zh:'0/60', en:'0/60'},
+  ugc_tip:{zh:'一句话就好 · 不超过 60 字 · 请勿留下个人信息或不当内容', en:'One line is enough · max 60 chars · please don\'t leave personal info or harmful content'},
+  ugc_warn_len:{zh:'再写一点点？至少 1 个字。', en:'Add a little more? At least 1 character.'},
+  ugc_warn_safe:{zh:'这句话好像带了联系方式或链接，先去掉吧。', en:'This line looks like it has contact info or a link — please remove it.'},
+  th_a_bailey:{zh:'和 Bailey\'s Island 的关系', en:'Its place in Bailey\'s Island'},
+  th_a_b1:{zh:'自卑与超越 → 海滩相册：退潮后，拾起自己的壳', en:'Inferiority & Beyond → Beach Album: After the tide, pick up your own shell'},
+  th_a_b2:{zh:'社会兴趣 → 花田长椅：坐下，有人把花放在你身旁', en:'Social Interest → Flower Field Bench: Sit down; someone sets a flower by you'},
+  th_a_b3:{zh:'目的论 → 心理地形：先迈一步，路在脚下亮起', en:'Teleology → The Mindscape: Take one step; the path lights under your feet'},
+  th_a_b4:{zh:'课题分离 → 夜航码头：把别人的灯，轻轻还回去', en:'Task Separation → Night Voyage Pier: Gently hand back someone else\'s lantern'},
+  ugc_h2:{zh:'写下一句话 · 传给另一个人', en:'Write one line · pass it to another'},
+  ugc_p:{zh:'灵感卡不只是固定的 21 张。把一句你曾听到过、或很想送给别人的温暖的话写下来——它会被存进你的设备；也可以抽一张「陌生人的一句话」，当作今天小小的连接。', en:'Inspiration Cards are not just the fixed 21. Write down a warm line you once heard, or one you\'d love to give someone — it\'s saved on your device. Or draw a "stranger\'s line" as a small connection for today.'},
+  ugc_write_t:{zh:'写下一句话', en:'Write one line'},
+  ugc_write_p:{zh:'存在你自己设备上，随时回来读。也可以送给某个你想起的人。', en:'Saved on your own device, to read anytime. You can also send it to someone you think of.'},
+  ugc_save:{zh:'存下来', en:'Save it'},
+  ugc_recv_t:{zh:'收到陌生人的一句话', en:'A line from a stranger'},
+  ugc_recv_p:{zh:'点一下，随机来一句。它也许来自某个人曾经的温柔。', en:'Tap to draw one at random. It may carry someone\'s past tenderness.'},
+  ugc_recv_l:{zh:'FROM SOMEONE', en:'FROM SOMEONE'},
+  ugc_recv_btn:{zh:'再抽一张', en:'Draw another'},
+  ugc_placeholder:{zh:'例如：你今天已经很努力了，这就够了。', en:'e.g. You did your best today, and that is enough.'},
+  ugc_empty:{zh:'还没有写下的话。第一句，留给此刻的自己。', en:'No lines written yet. Let the first one be for who you are right now.'},
+  ugc_saved_msg:{zh:'已存下', en:'Saved'},
+  src_btn_a:{zh:'深入了解 · 阿德勒心理学', en:'Learn more · Adlerian Psychology'},
+  src_btn_r:{zh:'深入了解 · 彩虹卡', en:'Learn more · Rainbow Cards'},
+  th_a_t:{zh:'阿德勒心理学 · 个体心理学', en:'Adlerian Psychology · Individual Psychology'},
+  th_a_s:{zh:'Alfred Adler · 1870–1937', en:'Alfred Adler · 1870–1937'},
+  th_a_1:{zh:'阿德勒创立「个体心理学」：人是不可分割的整体。他相信<b>自卑感人人都有、并不可怕</b>——它是成长的起点；人凭借「追求超越」向前，不是压过别人，而是成为更完整的自己。', en:'Adler founded "Individual Psychology": a person is an indivisible whole. He believed the feeling of inferiority is universal — not something to fear, but the starting point of growth; people move forward through the drive to "strive beyond," not to outdo others, but to become a fuller self.'},
+  th_a_2:{zh:'四块基石共同指向一件事：<b>人如何在关系里活出意义</b>。课题分离，是这把体系里最锋利也最温柔的尺子——分清「这是谁的课题」，不替别人扛，也不让别人替我们活。', en:'These four foundations point to one thing: <b>how a person lives out meaning in relationships</b>. Task separation is the sharpest yet gentlest ruler in this system — sorting out "whose task this is," not carrying others\' burdens, and not letting others live our lives for us.'},
+  th_a_3:{zh:'对这副牌的启发：每张课题卡的问句都围绕「谁的课题」——结果由谁承担、我能控制什么、管下去会不会累。卡牌把抽象理论，变成 9 岁到 99 岁都能用的一句话练习。', en:'Inspiration for this deck: every practice card\'s question revolves around "whose task" — who bears the outcome, what I can control, whether holding on will wear me out. The deck turns abstract theory into one-sentence practices for ages 9 to 99.'},
+  th_r_t:{zh:'彩虹卡 · 正向能量', en:'Rainbow Cards · Positive Energy'},
+  th_r_s:{zh:'Rainbow Cards · Doris Wenzel', en:'Rainbow Cards · Doris Wenzel'},
+  th_r_1:{zh:'彩虹卡由德国艺术治疗师多丽丝·文策尔研发，245 张带有积极信念的卡片，涵盖<b>红橙黄绿蓝靛紫</b>七色。每张都写着一句智慧而肯定的话。', en:'Rainbow Cards were developed by German art therapist Doris Wenzel: 245 cards carrying positive beliefs, spanning <b>seven colors — red, orange, yellow, green, blue, indigo, violet</b>. Each holds a wise, affirming sentence.'},
+  th_r_2:{zh:'它的理论基础是<b>吸引力法则</b>与<b>积极心理学</b>：用正面的语句帮使用者调整心态，引导人关注自身的优点与生活的美好。21 张灵感卡便借鉴了这种形式。', en:'Its foundations are the <b>Law of Attraction</b> and <b>Positive Psychology</b>: affirmative language helps shift the user\'s mindset and guides attention to one\'s strengths and life\'s beauty. The 21 Inspiration Cards borrow this form.'},
+  th_r_3:{zh:'对这副牌的启发：灵感卡不参与问答机制，只负责在你低落时递上一束光——抽到后不用分析，读三遍，让这句话陪你一会儿。', en:'Inspiration for this deck: Inspiration Cards take no part in the Q&A; they only hand you a beam of light when you feel low — no analysis needed, just read it three times and let it keep you company.'}
+});
+
+/* ==================== 渲染 ==================== */
+let lang = 'zh'; // 当前语言: 'zh' | 'en'
+const pick = o => o ? (o[lang] !== undefined ? o[lang] : o.zh) : '';
+const L = k => (I18N[lang] && I18N[lang][k] !== undefined) ? I18N[lang][k] : k;
+let currentMod = 'about';
+
+function renderTabs(){
+  const wrap = document.getElementById('modTabs');
+  wrap.innerHTML = MODULES.map(m =>
+    `<button class="mod-tab" data-id="${m.id}" style="${m.id===currentMod?'background:'+m.color+';border-color:'+m.color+'':''}">${pick(m.name)}</button>`
+  ).join('');
+  wrap.querySelectorAll('.mod-tab').forEach(btn=>{
+    btn.addEventListener('click',()=>{ currentMod = btn.dataset.id; renderTabs(); renderCards(); });
+  });
+}
+
+function renderCards(){
+  const m = MODULES.find(x=>x.id===currentMod);
+  const g = m.guide;
+  const gt = pick(g.title), gx = pick(g.text), gb = pick(g.back);
+  document.getElementById('modNote').innerHTML = `${pick(m.note)}`;
+  const grid = document.getElementById('cardGrid');
+  let html = '';
+
+  if(m.id === 'inspiration'){
+    // 灵感卡场景指引
+    html += `<div class="guide-card">
+      <span class="badge" style="background:linear-gradient(135deg,#E57373,#FFB74D,#64B5F6,#BA68C8)">${L('cards_insp_badge')}</span>
+      <div><div class="g-title">${gt}</div>
+      <div class="g-text">${gx}<br><b>${L('cards_guide_back')}</b>${gb}</div></div>
+    </div>`;
+    INSPIRATIONS.forEach((c,i)=>{
+      const color = INSPIRE_COLORS[i % INSPIRE_COLORS.length];
+      html += `<div class="insp-card" onclick="this.classList.toggle('flipped')">
+        <div class="insp-card-inner">
+          <div class="insp-face insp-front" style="background:linear-gradient(160deg,${color},${shade(color,-25)})">
+            <span class="in-no">${L('cards_insp_no')} · ${String(i+1).padStart(2,'0')}</span>
+            <div class="in-zh">${c.zh}</div>
+            <div class="in-en">${c.en}</div>
+          </div>
+          <div class="insp-face insp-back">
+            <div class="in-logo">${L('fc4_logo')}</div>
+            <div class="in-tip">${L('cards_insp_tip')}</div>
+            <div class="in-hint">${L('cards_hint')}</div>
+          </div>
+        </div>
+      </div>`;
+    });
+    grid.innerHTML = html;
+    return;
+  }
+
+  // 场景指引卡
+  html += `<div class="guide-card">
+      <span class="badge" style="background:${m.color}">${L('cards_guide_badge')}</span>
+      <div><div class="g-title">${gt}</div>
+      <div class="g-text">${gx}<br><b style="color:${m.color}">${L('cards_guide_back')}</b>${gb}</div></div>
+    </div>`;
+  // 课题卡
+  m.cards.forEach(c=>{
+    const cd = pick(c);
+    html += `<div class="tcard" onclick="this.classList.toggle('flipped')">
+      <div class="tcard-inner">
+        <div class="tcard-face tcard-front">
+          <div class="tno">${L('cards_tno')} · ${c.no}</div>
+          <div class="ttitle">${cd.title}</div>
+          <div class="ttext">${cd.text}</div>
+          <div class="tsub">${L('cards_flip')}</div>
+        </div>
+        <div class="tcard-face tcard-back" style="background:linear-gradient(160deg,${m.color},${shade(m.color,-18)})">
+          <div class="q">${cd.q}</div>
+          <div class="qtip">💡 ${cd.tip}</div>
+          <div class="flip-hint">${L('cards_hint')}</div>
+        </div>
+      </div>
+    </div>`;
+  });
+  // 模块练习卡
+  if(m.practice){
+    const pt = pick(m.practice.title), px = pick(m.practice.text), pb = pick(m.practice.back);
+    html += `<div class="practice-card">
+      <span class="p-badge">${L('cards_practice')}</span>
+      <div><div class="p-title">${pt}</div>
+      <div class="p-text">${px}<br><b>${L('cards_guide_back')}</b>${pb}</div></div>
+    </div>`;
+  }
+  grid.innerHTML = html;
+}
+
+/* 颜色变深工具 */
+function shade(hex, amt){
+  const n = hex.replace('#','');
+  const r = Math.max(0, parseInt(n.substr(0,2),16)+amt);
+  const g = Math.max(0, parseInt(n.substr(2,2),16)+amt);
+  const b = Math.max(0, parseInt(n.substr(4,2),16)+amt);
+  return '#' + [r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+
+/* ==================== 随机抽牌 ==================== */
+let drawIsInsp = false;
+function openDraw(){
+  drawIsInsp = Math.random() < 0.3; // 30% 抽到灵感卡
+  const stage = document.getElementById('drawStage');
+  stage.classList.remove('draw');
+  document.getElementById('drawHint').textContent = L('draw_hint_open');
+  const front = document.getElementById('drawFront');
+  front.className = 'draw-face';
+
+  if(drawIsInsp){
+    const i = Math.floor(Math.random()*INSPIRATIONS.length);
+    const c = INSPIRATIONS[i];
+    const color = INSPIRE_COLORS[i % INSPIRE_COLORS.length];
+    front.className = 'draw-face draw-insp-front';
+    front.style.background = `linear-gradient(160deg,${color},${shade(color,-25)})`;
+    front.innerHTML = `
+      <div style="font-size:12px;opacity:.85">${L('draw_insp_no')} · ${String(i+1).padStart(2,'0')}</div>
+      <div class="di-zh">${c.zh}</div>
+      <div class="di-en">${c.en}</div>`;
+  } else {
+    const pool = MODULES.filter(x=>x.id!=='inspiration');
+    const m = pool[Math.floor(Math.random()*pool.length)];
+    const c = pick(m.cards[Math.floor(Math.random()*m.cards.length)]);
+    front.className = 'draw-face draw-front';
+    front.style.background = '#fff';
+    front.innerHTML = `
+      <div class="dno">${pick(m.name)} · ${L('draw_task')} ${c.no}</div>
+      <div class="dtitle">${c.title}</div>
+      <div class="dtext">${c.text}</div>
+      <div class="dq">${c.q}</div>
+      <div class="dtip">💡 ${c.tip}</div>`;
+  }
+  document.getElementById('drawModal').classList.add('show');
+  requestAnimationFrame(()=>setTimeout(()=>stage.classList.add('draw'),150));
+}
+function flipDraw(){
+  const stage = document.getElementById('drawStage');
+  stage.classList.toggle('draw');
+  document.getElementById('drawHint').textContent = stage.classList.contains('draw') ? L('draw_hint_close') : L('draw_hint_open');
+}
+
+/* ==================== 语言切换 ==================== */
+function refreshI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k = el.getAttribute('data-i18n');
+    if(I18N[lang] && I18N[lang][k] !== undefined) el.innerHTML = I18N[lang][k];
+  });
+}
+function applyLang(){
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+  const btn = document.getElementById('langBtn');
+  btn.textContent = lang === 'zh' ? 'EN' : '中文';
+  btn.setAttribute('aria-label', lang === 'zh' ? 'Switch to English' : '切换到中文');
+  refreshI18n();
+  const ta = document.getElementById('ugcInput');
+  if(ta) ta.placeholder = L('ugc_placeholder');
+  renderTabs();
+  renderCards();
+  try{ loadUgc(); showReceived(); }catch(e){}
+  try{ localStorage.setItem('baili-isle-lang', lang); }catch(e){}
+}
+function toggleLang(){
+  lang = lang === 'zh' ? 'en' : 'zh';
+  applyLang();
+}
+
+/* ==================== 功能 ==================== */
+function gotoMod(id){
+  currentMod = id;
+  renderTabs();
+  renderCards();
+  document.getElementById('cards').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+/* ---- 引导弹层（从心情出发）---- */
+function openIntro(){
+  const m = document.getElementById('introModal');
+  if(m) m.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeIntro(){
+  const m = document.getElementById('introModal');
+  if(m) m.classList.remove('show');
+  document.body.style.overflow = '';
+  try{ localStorage.setItem('baili-isle-intro', '1'); }catch(e){}
+}
+function chooseSit(id){
+  closeIntro();
+  setTimeout(function(){ gotoMod(id); }, 140);
+}
+
+/* ---- 灵感卡 UGC ---- */
+const UGC_KEY = 'baili-isle-ugc';
+const UGC_SEED = {
+  zh: [
+    '你今天已经很努力了，这就够了。',
+    '慢慢来，比较快。',
+    '你不需要很完美，也值得被爱。',
+    '难过的时候，先抱抱自己。',
+    '你已经比昨天的自己勇敢了一点。',
+    '允许自己休息，不是偷懒。',
+    '有人正因为你存在，而觉得世界温柔一点。',
+    '你不必替所有人的情绪负责。',
+    '今天的你，辛苦了。',
+    '你值得被温柔地对待，包括被自己。'
+  ],
+  en: [
+    "You did your best today, and that is enough.",
+    "Slow is smooth, smooth is fast.",
+    "You don't have to be perfect to be worthy of love.",
+    "When it hurts, hold yourself first.",
+    "You are a little braver than yesterday's you.",
+    "Resting is not being lazy.",
+    "Someone's world is gentler because you exist.",
+    "You don't have to carry everyone's feelings.",
+    "You've had a long day. Be kind to yourself.",
+    "You deserve to be treated gently — by yourself, too."
+  ]
+};
+function loadUgc(){
+  let list = [];
+  try{ list = JSON.parse(localStorage.getItem(UGC_KEY) || '[]'); }catch(e){ list = []; }
+  const box = document.getElementById('ugcSaved');
+  if(!box) return;
+  if(list.length === 0){
+    box.innerHTML = '<div class="ts" style="color:var(--ink-soft)">'+L('ugc_empty')+'</div>';
+    return;
+  }
+  box.innerHTML = list.map((t,i)=>'<div class="ugc-item"><span>'+t.replace(/</g,'&lt;')+'</span><button class="del" onclick="delUgc('+i+')" aria-label="删除">×</button></div>').join('');
+}
+function onUgcInput(){
+  const ta = document.getElementById('ugcInput');
+  const c = document.getElementById('ugcCount');
+  const n = (ta.value || '').length;
+  if(c) c.textContent = n + '/60';
+  const btn = document.getElementById('ugcSaveBtn');
+  if(btn) btn.disabled = (n === 0 || n > 60);
+}
+function ugcSafe(v){
+  // 轻量内容安全：拦截电话 / 网址 / 邮箱 等特征，避免玩家留下真实联系方式
+  if(/https?:\/\/|www\.|\.com|\.cn|@|(\d[\s-]?){9,}|(\d{3,4}-?){2,}\d{4}/.test(v)) return false;
+  return true;
+}
+function saveUgc(){
+  const ta = document.getElementById('ugcInput');
+  const v = (ta.value || '').trim();
+  const m = document.getElementById('ugcMsg');
+  if(!v){ if(m) m.textContent = L('ugc_warn_len'); return; }
+  if(v.length > 60){ if(m) m.textContent = L('ugc_warn_len'); return; }
+  if(!ugcSafe(v)){ if(m) m.textContent = L('ugc_warn_safe'); return; }
+  let list = [];
+  try{ list = JSON.parse(localStorage.getItem(UGC_KEY) || '[]'); }catch(e){ list = []; }
+  list.unshift(v);
+  try{ localStorage.setItem(UGC_KEY, JSON.stringify(list.slice(0,30))); }catch(e){}
+  ta.value = '';
+  if(m){ m.textContent = L('ugc_saved_msg'); setTimeout(function(){ m.textContent=''; }, 2200); }
+  onUgcInput();
+  loadUgc();
+}
+function delUgc(i){
+  let list = [];
+  try{ list = JSON.parse(localStorage.getItem(UGC_KEY) || '[]'); }catch(e){ list = []; }
+  list.splice(i,1);
+  try{ localStorage.setItem(UGC_KEY, JSON.stringify(list)); }catch(e){}
+  loadUgc();
+}
+let recvPool = UGC_SEED[lang].slice();
+function showReceived(){
+  const el = document.getElementById('ugcRecvText');
+  if(!el) return;
+  if(recvPool.length === 0) recvPool = UGC_SEED[lang].slice();
+  const i = Math.floor(Math.random()*recvPool.length);
+  const t = recvPool.splice(i,1)[0];
+  const ql = lang === 'en' ? '"' : '「';
+  const qr = lang === 'en' ? '"' : '」';
+  el.textContent = ql + t + qr;
+}
+
+/* ---- 理论详情弹层 ---- */
+function adlerMap(){
+  const center = {x:340, y:46};
+  const nodes = [
+    {x:110, y:140, t:'自卑与超越', sub:'Inferiority', c:'#4A9D8F'},
+    {x:570, y:140, t:'社会兴趣', sub:'Social Interest', c:'#4A9D8F'},
+    {x:110, y:262, t:'目的论', sub:'Teleology', c:'#E9B44C'},
+    {x:570, y:262, t:'课题分离', sub:'Task Separation', c:'#E07A5F'}
+  ];
+  const lines = nodes.map(n=>'<line x1="'+center.x+'" y1="'+(center.y+22)+'" x2="'+n.x+'" y2="'+(n.y-23)+'" stroke="#cbb" stroke-width="1.4"/>').join('');
+  const centerBox = '<g><rect x="'+(center.x-90)+'" y="'+(center.y-22)+'" width="180" height="46" rx="14" fill="#2f6f6a"/><text x="'+center.x+'" y="'+(center.y+2)+'" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">阿德勒心理学</text><text x="'+center.x+'" y="'+(center.y+18)+'" text-anchor="middle" font-size="10" fill="#dff">个体心理学</text></g>';
+  const boxes = nodes.map(n=>'<g><rect x="'+(n.x-80)+'" y="'+(n.y-23)+'" width="160" height="46" rx="12" fill="#fff" stroke="'+n.c+'" stroke-width="1.4"/><text x="'+n.x+'" y="'+n.y+'" text-anchor="middle" font-size="14" font-weight="700" fill="'+n.c+'">'+n.t+'</text><text x="'+n.x+'" y="'+(n.y+16)+'" text-anchor="middle" font-size="10" fill="#888">'+n.sub+'</text></g>').join('');
+  return '<svg class="mmap" viewBox="0 0 680 310" role="img"><title>阿德勒心理学概念地图</title>'+lines+centerBox+boxes+'</svg>';
+}
+function rainbowMap(){
+  const cols=['#E57373','#FFB74D','#FFF176','#AED581','#64B5F6','#7986CB','#BA68C8'];
+  const labels=['红','橙','黄','绿','蓝','靛','紫'];
+  const dots = cols.map((c,i)=>'<circle cx="'+(60+i*90)+'" cy="60" r="26" fill="'+c+'"/><text x="'+(60+i*90)+'" y="118" text-anchor="middle" font-size="13" fill="#555">'+labels[i]+'</text>').join('');
+  return '<svg class="mmap" viewBox="0 0 680 160" role="img"><title>彩虹卡七色</title>'+dots+'<text x="340" y="150" text-anchor="middle" font-size="13" fill="#888">七色卡片 · 积极信念 · 245 张</text></svg>';
+}
+function theoryContent(which){
+  if(which === 'adler'){
+    return ''+
+      '<div class="tag" style="color:var(--accent);font-weight:700;letter-spacing:2px">ADLERIAN PSYCHOLOGY</div>'+
+      '<h3 data-i18n="th_a_t">阿德勒心理学 · 个体心理学</h3>'+
+      '<div class="tsub" data-i18n="th_a_s">Alfred Adler · 1870–1937</div>'+
+      '<p class="ttext" data-i18n="th_a_1">阿德勒创立「个体心理学」：人是不可分割的整体。他相信<b>自卑感人人都有、并不可怕</b>——它是成长的起点；人凭借「追求超越」向前，不是压过别人，而是成为更完整的自己。</p>'+
+      adlerMap()+
+      '<p class="ttext" data-i18n="th_a_2">四块基石共同指向一件事：<b>人如何在关系里活出意义</b>。课题分离，是这把体系里最锋利也最温柔的尺子——分清「这是谁的课题」，不替别人扛，也不让别人替我们活。</p>'+
+      '<div class="tnote" data-i18n="th_a_3">对这副牌的启发：每张课题卡的问句都围绕「谁的课题」——结果由谁承担、我能控制什么、管下去会不会累。卡牌把抽象理论，变成 9 岁到 99 岁都能用的一句话练习。</div>'+
+      '<div class="tnote" style="border-color:#E9B44C;background:#fdf6e8;margin-top:14px">'+
+        '<div class="tag" style="color:#E9B44C;font-weight:700;letter-spacing:2px;margin-bottom:8px">'+L('th_a_bailey')+'</div>'+
+        '<div style="font-size:13px;line-height:2.1">'+L('th_a_b1')+'<br>'+L('th_a_b2')+'<br>'+L('th_a_b3')+'<br>'+L('th_a_b4')+'</div>'+
+      '</div>';
+  }
+  return ''+
+    '<div class="tag" style="color:#BA68C8;font-weight:700;letter-spacing:2px">RAINBOW CARDS</div>'+
+    '<h3 data-i18n="th_r_t">彩虹卡 · 正向能量</h3>'+
+    '<div class="tsub" data-i18n="th_r_s">Rainbow Cards · Doris Wenzel</div>'+
+    '<p class="ttext" data-i18n="th_r_1">彩虹卡由德国艺术治疗师多丽丝·文策尔研发，245 张带有积极信念的卡片，涵盖<b>红橙黄绿蓝靛紫</b>七色。每张都写着一句智慧而肯定的话。</p>'+
+    rainbowMap()+
+    '<p class="ttext" data-i18n="th_r_2">它的理论基础是<b>吸引力法则</b>与<b>积极心理学</b>：用正面的语句帮使用者调整心态，引导人关注自身的优点与生活的美好。21 张灵感卡便借鉴了这种形式。</p>'+
+    '<div class="tnote" data-i18n="th_r_3">对这副牌的启发：灵感卡不参与问答机制，只负责在你低落时递上一束光——抽到后不用分析，读三遍，让这句话陪你一会儿。</div>';
+}
+function openTheory(which){
+  document.getElementById('theoryPop').innerHTML = theoryContent(which);
+  document.getElementById('theoryModal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  refreshI18n();
+}
+function closeTheory(){
+  document.getElementById('theoryModal').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+/* ==================== 初始化 ==================== */
+try{
+  const saved = localStorage.getItem('baili-isle-lang');
+  if(saved === 'en' || saved === 'zh') lang = saved;
+}catch(e){}
+applyLang();
+try{ loadUgc(); showReceived(); }catch(e){}
+try{ if(!localStorage.getItem('baili-isle-intro')) openIntro(); }catch(e){}
+</script>
+
+<!-- ================= 引导弹层：从心情出发 ================= -->
+<div class="intro-fixed" id="introModal" onclick="if(event.target===this)closeIntro()">
+  <span class="close" onclick="closeIntro()">×</span>
+  <div class="intro-pop" id="introPop">
+    <div class="tag">START FROM YOU</div>
+    <div class="gate-q" data-i18n="intro_q">今天，是什么让你心里不舒服？</div>
+    <div class="gate-sub" data-i18n="intro_sub">不用想清楚，先挑一个最像此刻的你。点一下，我们陪你去对应的卡牌。</div>
+    <div class="gate-chips">
+      <button class="gate-chip" onclick="chooseSit('distress')"><span class="gt" data-i18n="g_distress">心里堵、情绪乱</span><span class="ge" data-i18n="g_distress_e">→ 心理困境</span></button>
+      <button class="gate-chip" onclick="chooseSit('boundary')"><span class="gt" data-i18n="g_boundary">被某人惹烦</span><span class="ge" data-i18n="g_boundary_e">→ 边界判断</span></button>
+      <button class="gate-chip" onclick="chooseSit('relation')"><span class="gt" data-i18n="g_relation">关系里很累</span><span class="ge" data-i18n="g_relation_e">→ 亲密关系</span></button>
+      <button class="gate-chip" onclick="chooseSit('worth')"><span class="gt" data-i18n="g_worth">觉得自己不够好</span><span class="ge" data-i18n="g_worth_e">→ 自我价值</span></button>
+      <button class="gate-chip" onclick="chooseSit('self')"><span class="gt" data-i18n="g_self">不知道要什么</span><span class="ge" data-i18n="g_self_e">→ 自我认知</span></button>
+      <button class="gate-chip" onclick="chooseSit('family')"><span class="gt" data-i18n="g_family">和家人相处累</span><span class="ge" data-i18n="g_family_e">→ 原生家庭</span></button>
+      <button class="gate-chip" onclick="chooseSit('inspiration')"><span class="gt" data-i18n="g_insp">只想被鼓励</span><span class="ge" data-i18n="g_insp_e">→ 灵感卡</span></button>
+      <button class="gate-chip" onclick="chooseSit('about')"><span class="gt" data-i18n="g_about">想先了解</span><span class="ge" data-i18n="g_about_e">→ 入门</span></button>
+    </div>
+    <div class="gate-or" data-i18n="intro_or">或者，<a href="#cards" onclick="closeIntro()">慢慢逛全部卡牌 →</a></div>
+    <div class="intro-bailey" data-i18n="intro_bailey">这套牌，也是 Bailey's Island 的一页。</div>
+  </div>
+</div>
+
+<!-- ================= 理论详情弹层 ================= -->
+<div class="theory-fixed" id="theoryModal" onclick="if(event.target===this)closeTheory()">
+  <span class="close" onclick="closeTheory()">×</span>
+  <div class="theory-pop" id="theoryPop"></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#8edee0">
+  <title>百灵岛·心的自留地 · Bailey's Island</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="v6.css">
+  <link rel="stylesheet" href="game-polish.css">
+  <style>
+    .cards-return-btn{margin-left:6px;padding:8px 16px;border:none;border-radius:999px;background:#2f6f6a;color:#fff;font-weight:700;font-size:13px;letter-spacing:1px;cursor:pointer;box-shadow:0 4px 14px rgba(47,111,106,.35);transition:transform .15s,background .2s;font-family:inherit;flex-shrink:0}
+    .cards-return-btn:hover{background:#265b57;transform:translateY(-1px)}
+    @media(max-width:520px){.cards-return-btn{padding:7px 12px;font-size:12px;margin-left:4px}}
+  </style>
+</head>
+<body class="theme-home">
+  <div class="intro-sequence" id="introSequence" aria-label="Bailey's Island opening">
+    <div class="intro-sea" aria-hidden="true"><i></i></div>
+    <div class="intro-shimmer" aria-hidden="true"></div>
+    <div class="intro-title" aria-hidden="true"><span>BAILEY'S ISLAND</span></div>
+    <p class="intro-line">当脑海变成天气，就从岸边开始。<small>When your mind turns to weather, begin at the shore.</small></p>
+    <button id="skipIntro" disabled aria-disabled="true">SKIP / 跳过</button>
+  </div>
+  <div class="paper-grain" aria-hidden="true"></div>
+  <div class="app">
+    <header class="topbar">
+      <button class="nav-icon home-control" id="homeBtn" aria-label="返回主页" title="Home">⌂</button>
+      <div class="brand"><span class="brand-b">✿</span><span>BAILEY'S ISLAND</span></div>
+      <div class="top-progress" id="topProgress" aria-label="关卡进度"><i class="active"></i><i></i><i></i><i></i></div>
+      <div class="level-chip" id="levelChip">百灵岛·心的自留地 · A HEART'S RETREAT</div>
+      <div class="top-actions">
+        <button class="cards-return-btn" id="cardsReturnBtn" aria-label="返回卡牌界面" title="返回卡牌界面 Bailey's Cards" onclick="location.href='./cards.html'">← 百灵卡</button>
+        <button class="nav-icon" id="musicBtn" aria-label="背景音乐" title="Music">♪</button>
+        <button class="nav-icon game-control" id="pauseBtn" aria-label="暂停游戏" title="Pause">Ⅱ</button>
+        <button class="nav-icon" id="helpBtn" aria-label="怎么玩" title="How to play">?</button>
+        <button class="nav-icon lang-btn" id="langBtn" aria-label="切换语言" title="Language">EN</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="view active" id="homeView" aria-label="主页">
+        <div class="home-hero">
+          <div class="home-copy">
+            <div class="kicker" data-i18n="prototype">PLAYABLE PROTOTYPE · 5–8 MIN</div>
+            <h1><span>Bailey's</span><em>Island</em></h1>
+            <h2 data-i18n="subtitle">百灵岛·心的自留地</h2>
+            <button class="about-entry" id="aboutBtn" data-i18n="aboutButton">作品与游戏说明</button>
+          </div>
+        </div>
+
+        <div class="level-select" aria-label="关卡选择">
+          <article class="level-card morning-card" data-level="0">
+            <div class="card-index">01</div><div class="card-time" data-i18n="morning">第一章 · CHAPTER I</div>
+            <div class="card-age">14–15 岁</div>
+            <h3 data-i18n="l1Title">海边相册</h3>
+            <p data-i18n="l1Desc">手机留言、海边拍照与情绪拼贴</p>
+            <button class="level-button" data-start-level="0"><span data-i18n="enter">进入关卡</span><b>→</b></button>
+          </article>
+          <article class="level-card afternoon-card locked" data-level="1">
+            <div class="lock-mark">锁 / LOCKED</div><div class="card-index">02</div><div class="card-time" data-i18n="afternoon">第二章 · CHAPTER II</div>
+            <div class="card-age">15–16 岁</div>
+            <h3 data-i18n="l2Title">花田长椅</h3>
+            <p data-i18n="l2Desc">友情、边界与真实表达</p>
+            <button class="level-button" data-start-level="1" disabled><span data-i18n="locked">完成上午后解锁</span><b>→</b></button>
+          </article>
+          <article class="level-card night-card locked" data-level="2">
+            <div class="lock-mark">锁 / LOCKED</div><div class="card-index">03</div><div class="card-time" data-i18n="night">第三章 · CHAPTER III</div>
+            <div class="card-age">16–17 岁</div>
+            <h3 data-i18n="l3Title">心理地形</h3>
+            <p data-i18n="l3Desc">压力、情绪与心理地形整理</p>
+            <button class="level-button" data-start-level="2" disabled><span data-i18n="locked2">完成下午后解锁</span><b>→</b></button>
+          </article>
+          <article class="level-card ferry-card locked" data-level="3">
+            <div class="lock-mark">锁 / LOCKED</div><div class="card-index">04</div><div class="card-time" data-i18n="ferry">第四章 · CHAPTER IV</div>
+            <div class="card-age">17–18 岁</div>
+            <h3 data-i18n="l4Title">离岛启程</h3>
+            <p data-i18n="l4Desc">专注、方向与离开小岛</p>
+            <button class="level-button" data-start-level="3" disabled><span data-i18n="locked3">完成第三章后解锁</span><b>→</b></button>
+          </article>
+        </div>
+        <div class="home-foot"><span id="homeStatus" data-i18n="homeStatus">进度会保存在这台设备上</span><button id="resetBtn" data-i18n="reset">重新开始</button></div>
+      </section>
+
+      <section class="view" id="levelView" aria-label="游戏关卡">
+        <div class="level-heading">
+          <div><div class="kicker" id="levelEyebrow"></div><h2 id="levelTitle"></h2></div>
+          <p id="levelPrompt"></p>
+        </div>
+        <div class="scene-stage" id="sceneStage">
+          <div class="scene-content" id="sceneContent"></div>
+        </div>
+        <div class="scene-nav"><div class="scene-dots" id="sceneDots"></div><span id="saveNotice"></span><button class="restart-level" id="restartLevelBtn">↺ 重新开始本关</button></div>
+      </section>
+    </main>
+
+    <footer><span data-i18n="disclaimer">概念原型 · 不替代专业心理支持 · 选择只保存在本机</span></footer>
+  </div>
+
+  <div class="loading-layer" id="loadingLayer" aria-live="polite">
+    <div class="transition-cloud cloud-a"></div><div class="transition-cloud cloud-b"></div>
+    <p id="loadingText">海风把早晨吹开……</p>
+  </div>
+
+  <div class="overlay" id="pauseOverlay" role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
+    <div class="pause-card">
+      <div class="kicker">PAUSE · NOTICE · RETURN</div>
+      <h2 id="pauseTitle" data-i18n="paused">游戏已暂停</h2>
+      <p data-i18n="pauseCopy">离开屏幕一会儿也没关系。你的关卡进度已经保存。</p>
+      <button class="primary-button" id="resumeBtn" data-i18n="resume">继续游戏</button>
+      <button class="text-button" id="pauseHomeBtn" data-i18n="backHome">保存并返回主页</button>
+    </div>
+  </div>
+
+  <div class="overlay about-overlay" id="aboutOverlay" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+    <div class="about-panel">
+      <button class="close-button" id="closeAbout" aria-label="关闭">×</button>
+      <div class="about-intro">
+        <img src="assets/ppt-p1.png" alt="Bailey's Island PPT 第一页视觉提案">
+        <div><div class="kicker">THE PHENOMENOLOGY OF ISLANDS</div><h2 id="aboutTitle" data-i18n="aboutTitle">作品与游戏说明</h2><p data-i18n="aboutLead">Bailey's Island 是一个围绕青少年发展变化设计的叙事型严肃游戏原型。岛屿是一处“过渡空间”：玩家能暂时与压力拉开距离，把感受变得可见，再带着新的理解回到现实。</p></div>
+      </div>
+      <div class="about-grid">
+        <article><span>01</span><h3 data-i18n="originTitle">为什么做这个项目</h3><p data-i18n="originBody">青少年在身体、身份、同伴关系、家庭期待、学业和未来方向同时变化时，常常缺少表达痛苦的语言。项目借鉴艺术治疗、游戏化介入与情绪调节方法，让“观察、命名、重演、选择”成为可操作的体验。</p></article>
+        <article><span>02</span><h3 data-i18n="theoryTitle">岛屿为什么不是逃避</h3><p data-i18n="theoryBody">设计受到 Winnicott“过渡空间”概念启发。岛不会永久替玩家隔绝现实；它提供一个安全脚手架，直到 Bailey 能把暂停、求助、表达和专注当成自己的能力。</p></article>
+        <article><span>03</span><h3 data-i18n="playTitle">四个章节怎么玩</h3><p data-i18n="playBody">海边相册：读手机留言、拍下海边小物并标记感受。花田长椅：观察社交线索并重演回应。心理地形：让压力变得可见。离岛启程：整理方向，再乘渡船离开。</p></article>
+        <section class="about-category">
+          <div class="kicker">RESEARCH · DEVELOPMENT & TRANSITION</div>
+          <div class="about-media-grid">
+            <figure><img src="assets/guide-empirical-inspiration.png" alt="Theoretical and empirical inspiration"><figcaption data-i18n="guideEmpirical">理论与经验灵感：非暴力的象征空间</figcaption></figure>
+            <figure><img src="assets/guide-serious-games.png" alt="Serious games and psycho-educational design"><figcaption data-i18n="guideSerious">严肃游戏：叙事、觉察与情绪调节</figcaption></figure>
+            <figure><img src="assets/guide-development-stages.png" alt="青少年与成年早期的发展过渡阶段"><figcaption>发展阶段与同时发生的变化</figcaption></figure>
+            <figure class="research-bottom"><img src="assets/guide-transitional-space.png" alt="Winnicott 过渡空间理论与岛屿设计"><figcaption>过渡空间：现实与内在之间的安全脚手架</figcaption></figure>
+            <figure class="research-bottom"><img src="assets/guide-self-concept.png" alt="青少年与成年早期的自我概念问题"><figcaption>不同成长阶段面对的自我问题</figcaption></figure>
+          </div>
+        </section>
+        <section class="about-category">
+          <div class="kicker">PLAY SYSTEM · OBSERVE, NAME & ARRANGE</div>
+          <div class="about-media-grid">
+            <figure class="guide-feature"><img src="assets/ppt-p4.png" alt="Bailey's Island 项目起源与玩法依据"><figcaption>项目起源与体验依据</figcaption></figure>
+          </div>
+        </section>
+      </div>
+      <section class="setting-section">
+        <div class="kicker">SETTING · WORLD & CHARACTER</div><h3 data-i18n="settingTitle">岛屿与 Bailey 的设定</h3>
+        <p data-i18n="settingBody">岛屿是一处暂时停靠的心理空间：树、风、水流与岸线帮助压力从模糊的身体感受，变成可以观察、命名和摆放的东西。Bailey 不是固定年龄或固定外形的人物，而是玩家在变化中的自我投影。</p>
+        <div class="setting-gallery"><figure><img src="assets/setting-island.png" alt="岛屿世界设定完整页面"><figcaption>岛屿：自留地、边界与连接</figcaption></figure><figure><img src="assets/setting-stages.png" alt="成长过渡阶段完整页面"><figcaption>变化：身份、关系与未来方向同时发生</figcaption></figure><figure><img src="assets/setting-bailey.png" alt="Bailey 人物设定完整页面"><figcaption>Bailey：任何正在变化的人</figcaption></figure></div>
+      </section>
+      <section class="design-section"><div class="kicker">LEVEL DESIGN · VISUAL LANGUAGE</div><h3>关卡机制与视觉依据</h3><div class="design-gallery"><img src="assets/setting-level-one.png" alt="海边关卡完整页面"><img src="assets/setting-collage.png" alt="拍照与拼贴完整页面"><img src="assets/setting-social.png" alt="手机留言完整页面"><img src="assets/setting-departure.png" alt="渡口设定完整页面"><img class="design-wide" src="assets/setting-fishing.png" alt="钓鱼机制完整页面"></div></section>
+      <div class="how-to"><h3 data-i18n="howTitle">操作方式</h3><div><b>点击 / CLICK</b><span data-i18n="howClick">探索物件、选择对话、标记情绪</span></div><div><b>暂停 / PAUSE</b><span data-i18n="howPause">任何时刻暂停或保存返回主页</span></div><div><b>解锁 / UNLOCK</b><span data-i18n="howUnlock">完成一个年龄阶段后解锁下一阶段</span></div></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="confirmOverlay" role="dialog" aria-modal="true">
+    <div class="confirm-card"><h2 id="confirmTitle"></h2><p id="confirmCopy"></p><div><button class="text-button" id="confirmCancel"></button><button class="primary-button" id="confirmOk"></button></div></div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="game.js"></script>
+</body>
+</html>

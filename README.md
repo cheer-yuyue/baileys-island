@@ -21,3 +21,11 @@ This project retains the original page structure, core stylesheet, home composit
 - Chinese/English toggle, pause, save-and-return, local autosave, per-level replay, and full journey reset.
 
 Progress is saved in the browser's local storage. This conceptual prototype does not replace professional mental-health support.
+
+## License
+
+The source code of Bailey’s Island is licensed under the MIT License.
+
+Original artwork and visual assets in the `assets/` directory are created by Cheer (`cheer-yuyue`) and licensed under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
+
+When reusing or adapting the artwork, please provide appropriate credit, include a link to the license, and indicate whether changes were made.
